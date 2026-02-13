@@ -1,7 +1,7 @@
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 
 type Props = {
-    title: string;
+    title: ReactNode;
     helperText?: string;
     value: string;
     onChange: (value: string) => void;

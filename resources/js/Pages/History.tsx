@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
-import { formatHumanDate } from '../lib/date';
+import { formatHumanDate, todayIso } from '../lib/date';
 import { listAllEntries, pushUnsyncedEntries } from '../lib/db';
 
 type ServerEntry = {
@@ -130,7 +130,10 @@ export default function History() {
                                         <td className="text-base-content/70">{entry.grace_snippet || '-'}</td>
                                         <td className="text-base-content/70">{entry.gratitude_snippet || '-'}</td>
                                         <td>
-                                            <Link href={`/today?date=${entry.entry_date}`} className="btn btn-sm">
+                                            <Link
+                                                href={entry.entry_date === todayIso() ? `/today?date=${entry.entry_date}` : `/history/${entry.entry_date}`}
+                                                className="btn btn-sm"
+                                            >
                                                 Open
                                             </Link>
                                         </td>

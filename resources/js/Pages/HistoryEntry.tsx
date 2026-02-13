@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import AppShell from '../Components/AppShell';
 import { formatHumanDate } from '../lib/date';
@@ -17,12 +18,14 @@ type PageProps = {
     entry: Entry;
 };
 
-function ReadOnlySection({ title, value }: { title: string; value: string | null }) {
+function ReadOnlySection({ title, value }: { title: ReactNode; value: string | null }) {
     return (
-        <div className="card bg-base-100 shadow-sm">
-            <div className="card-body gap-3">
-                <h2 className="card-title text-lg">{title}</h2>
-                <p className="whitespace-pre-wrap opacity-90">{value?.trim() || '-'}</p>
+        <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card-body gap-4 p-6">
+                <h2 className="text-base font-medium text-base-content">{title}</h2>
+                <div className="min-h-[120px] whitespace-pre-wrap rounded-xl border border-base-300/70 bg-white p-4 text-base leading-relaxed text-base-content">
+                    {value?.trim() || '-'}
+                </div>
             </div>
         </div>
     );
@@ -31,6 +34,7 @@ function ReadOnlySection({ title, value }: { title: string; value: string | null
 export default function HistoryEntry() {
     const { props } = usePage<PageProps>();
     const [resolvedEntry, setResolvedEntry] = useState<Entry>(props.entry);
+    const formattedDate = formatHumanDate(props.date);
 
     useEffect(() => {
         let ignore = false;
@@ -83,13 +87,13 @@ export default function HistoryEntry() {
 
     return (
         <AppShell>
-            <Head title="Entry" />
+            <Head title={formattedDate} />
 
-            <div className="card bg-base-100 shadow-sm">
-                <div className="card-body gap-4">
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-4 p-6">
                     <div>
-                        <h1 className="card-title text-2xl">Entry</h1>
-                        <p className="opacity-70">{formatHumanDate(props.date)}</p>
+                        <h1 className="text-2xl font-semibold text-base-content">{formattedDate}</h1>
+                        <p className="text-sm text-base-content/70">Saved reflection</p>
                     </div>
                     <div>
                         <Link href="/history" className="btn btn-sm">
@@ -99,9 +103,30 @@ export default function HistoryEntry() {
                 </div>
             </div>
 
-            <ReadOnlySection title="1) Person" value={resolvedEntry?.person ?? null} />
-            <ReadOnlySection title="2) Grace" value={resolvedEntry?.grace ?? null} />
-            <ReadOnlySection title="3) Gratitude" value={resolvedEntry?.gratitude ?? null} />
+            <ReadOnlySection
+                title={
+                    <>
+                        <span className="font-semibold">Who</span> are you grateful for today?
+                    </>
+                }
+                value={resolvedEntry?.person ?? null}
+            />
+            <ReadOnlySection
+                title={
+                    <>
+                        What moment of <span className="font-semibold">grace</span> did you notice?
+                    </>
+                }
+                value={resolvedEntry?.grace ?? null}
+            />
+            <ReadOnlySection
+                title={
+                    <>
+                        What else are you <span className="font-semibold">grateful</span> for?
+                    </>
+                }
+                value={resolvedEntry?.gratitude ?? null}
+            />
         </AppShell>
     );
 }

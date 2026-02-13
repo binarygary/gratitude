@@ -292,21 +292,33 @@ export default function Today() {
             </div>
 
             <PromptCard
-                title="Who are you grateful for today?"
+                title={
+                    <>
+                        <span className="font-semibold">Who</span> are you grateful for today?
+                    </>
+                }
                 helperText="Name someone who made today feel a little brighter."
                 value={person}
                 onChange={setPerson}
                 placeholder="Write a few lines about them."
             />
             <PromptCard
-                title="What moment of grace did you notice?"
+                title={
+                    <>
+                        What moment of <span className="font-semibold">grace</span> did you notice?
+                    </>
+                }
                 helperText="Capture one moment of kindness, beauty, or support."
                 value={grace}
                 onChange={setGrace}
                 placeholder="What stood out to you?"
             />
             <PromptCard
-                title="What else are you grateful for?"
+                title={
+                    <>
+                        What else are you <span className="font-semibold">grateful</span> for?
+                    </>
+                }
                 helperText="Add anything else that helped you feel grounded."
                 value={gratitude}
                 onChange={setGratitude}

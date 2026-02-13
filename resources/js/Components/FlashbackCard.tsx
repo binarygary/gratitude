@@ -1,5 +1,4 @@
 import { formatHumanDate } from '../lib/date';
-import { Link } from '@inertiajs/react';
 
 type Flashback = {
     entry_date: string;
@@ -22,17 +21,14 @@ export default function FlashbackCard({ title, flashback }: Props) {
                     <>
                         <p className="text-sm text-base-content/60">{formatHumanDate(flashback.entry_date)}</p>
                         <p className="text-sm text-base-content/80">
-                            <span className="font-semibold text-base-content">Person:</span> {flashback.person.trim() || '-'}
+                            <span className="font-semibold text-base-content">Who:</span> {flashback.person.trim() || '-'}
                         </p>
                         <p className="text-sm text-base-content/80">
                             <span className="font-semibold text-base-content">Grace:</span> {flashback.grace.trim() || '-'}
                         </p>
                         <p className="text-sm text-base-content/80">
-                            <span className="font-semibold text-base-content">Gratitude:</span> {flashback.gratitude.trim() || '-'}
+                            <span className="font-semibold text-base-content">Grateful:</span> {flashback.gratitude.trim() || '-'}
                         </p>
-                        <Link href={`/today?date=${flashback.entry_date}`} className="btn btn-ghost btn-sm w-fit">
-                            Open reflection
-                        </Link>
                     </>
                 ) : (
                     <>
