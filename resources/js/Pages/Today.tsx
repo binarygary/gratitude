@@ -1,10 +1,10 @@
 import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AppShell from '../Components/AppShell';
 import FlashbackCard from '../Components/FlashbackCard';
 import PromptCard from '../Components/PromptCard';
-import { getEntryByDate, pushUnsyncedEntries, upsertLocalEntry } from '../lib/db';
+import { getEntryByDate, pushUnsyncedEntries, seedLocalEntries, upsertLocalEntry } from '../lib/db';
 
 type Entry = {
     entry_date: string;
@@ -18,8 +18,8 @@ type PageProps = {
     date: string;
     entry: Entry;
     flashbacks: {
-        weekAgo: { entry_date: string; snippet: string } | null;
-        yearAgo: { entry_date: string; snippet: string } | null;
+        weekAgo: { entry_date: string; person: string; grace: string; gratitude: string } | null;
+        yearAgo: { entry_date: string; person: string; grace: string; gratitude: string } | null;
     };
     showFlashbacks: boolean;
     isAuthenticated: boolean;
@@ -31,6 +31,72 @@ type PageProps = {
     };
 };
 
+type Flashback = { entry_date: string; person: string; grace: string; gratitude: string } | null;
+
+type LocalSeedRequest = {
+    days: number;
+    endDate?: string;
+    clearExisting: boolean;
+};
+
+function ymdMinusDays(ymd: string, days: number): string {
+    const date = new Date(`${ymd}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() - days);
+    return date.toISOString().slice(0, 10);
+}
+
+function ymdMinusYears(ymd: string, years: number): string {
+    const date = new Date(`${ymd}T12:00:00Z`);
+    date.setUTCFullYear(date.getUTCFullYear() - years);
+    return date.toISOString().slice(0, 10);
+}
+
+function localFlashbackSnippet(entry: { entry_date: string; person: string; grace: string; gratitude: string } | undefined): Flashback {
+    if (!entry) {
+        return null;
+    }
+
+    const hasContent = [entry.person, entry.grace, entry.gratitude]
+        .map((value) => value.trim())
+        .filter((value) => value.length > 0)
+        .length > 0;
+
+    if (!hasContent) {
+        return null;
+    }
+
+    return {
+        entry_date: entry.entry_date,
+        person: entry.person,
+        grace: entry.grace,
+        gratitude: entry.gratitude,
+    };
+}
+
+function getLocalSeedRequest(): LocalSeedRequest | null {
+    const params = new URLSearchParams(window.location.search);
+    const daysRaw = params.get('seed_local_days') ?? params.get('seed');
+
+    if (!daysRaw) {
+        return null;
+    }
+
+    const parsedDays = Number.parseInt(daysRaw, 10);
+
+    if (!Number.isFinite(parsedDays) || parsedDays <= 0) {
+        return null;
+    }
+
+    const endDate = params.get('seed_local_end') ?? undefined;
+    const clearExisting = params.get('seed_local_reset') === '1';
+
+    return {
+        days: Math.max(1, Math.min(parsedDays, 2000)),
+        endDate,
+        clearExisting,
+    };
+}
+
 export default function Today() {
     const { props } = usePage<PageProps>();
     const [person, setPerson] = useState('');
@@ -39,6 +105,12 @@ export default function Today() {
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
     const [savedCount, setSavedCount] = useState<number>(() => Number(localStorage.getItem('save_count') ?? '0'));
+    const [seedMessage, setSeedMessage] = useState<string | null>(null);
+    const [localFlashbacks, setLocalFlashbacks] = useState<{ weekAgo: Flashback; yearAgo: Flashback }>({
+        weekAgo: null,
+        yearAgo: null,
+    });
+    const lastSeedQueryRef = useRef<string | null>(null);
 
     const hasNonEmptyContent = useMemo(
         () => [person, grace, gratitude].some((value) => value.trim().length > 0),
@@ -49,6 +121,36 @@ export default function Today() {
         let ignore = false;
 
         const load = async () => {
+            if (!props.auth.user) {
+                const queryKey = window.location.search;
+                const seedRequest = getLocalSeedRequest();
+
+                if (seedRequest && lastSeedQueryRef.current !== queryKey) {
+                    const result = await seedLocalEntries(seedRequest);
+                    lastSeedQueryRef.current = queryKey;
+                    setSeedMessage(
+                        `Seeded ${result.seeded} local entries (${result.startDate} to ${result.endDate}).`,
+                    );
+                }
+
+                const [weekAgoEntry, yearAgoEntry] = await Promise.all([
+                    getEntryByDate(ymdMinusDays(props.date, 7)),
+                    getEntryByDate(ymdMinusYears(props.date, 1)),
+                ]);
+
+                if (!ignore) {
+                    setLocalFlashbacks({
+                        weekAgo: localFlashbackSnippet(weekAgoEntry),
+                        yearAgo: localFlashbackSnippet(yearAgoEntry),
+                    });
+                }
+            } else if (!ignore) {
+                setLocalFlashbacks({
+                    weekAgo: null,
+                    yearAgo: null,
+                });
+            }
+
             const local = await getEntryByDate(props.date);
             const server = props.entry;
 
@@ -115,6 +217,11 @@ export default function Today() {
         };
     }, [props.auth.user, props.date, props.entry]);
 
+    const resolvedFlashbacks = {
+        weekAgo: props.flashbacks.weekAgo ?? localFlashbacks.weekAgo,
+        yearAgo: props.flashbacks.yearAgo ?? localFlashbacks.yearAgo,
+    };
+
     const saveEntry = async () => {
         const updatedAt = Date.now();
 
@@ -128,7 +235,7 @@ export default function Today() {
                 gratitude,
                 updated_at: updatedAt,
                 synced_at: null,
-                server_entry_date: null,
+                server_entry_date: props.date,
             });
 
             if (props.auth.user) {
@@ -180,25 +287,38 @@ export default function Today() {
                     <p className="text-sm text-base-content/60">
                         Entries stay on your device and can be exported anytime. Sign in to sync so your reflections are available across devices.
                     </p>
+                    {seedMessage && <p className="text-sm text-success">{seedMessage}</p>}
                 </div>
             </div>
 
             <PromptCard
-                title="Who are you grateful for today?"
+                title={
+                    <>
+                        <span className="font-semibold">Who</span> are you grateful for today?
+                    </>
+                }
                 helperText="Name someone who made today feel a little brighter."
                 value={person}
                 onChange={setPerson}
                 placeholder="Write a few lines about them."
             />
             <PromptCard
-                title="What moment of grace did you notice?"
+                title={
+                    <>
+                        What moment of <span className="font-semibold">grace</span> did you notice?
+                    </>
+                }
                 helperText="Capture one moment of kindness, beauty, or support."
                 value={grace}
                 onChange={setGrace}
                 placeholder="What stood out to you?"
             />
             <PromptCard
-                title="What else are you grateful for?"
+                title={
+                    <>
+                        What else are you <span className="font-semibold">grateful</span> for?
+                    </>
+                }
                 helperText="Add anything else that helped you feel grounded."
                 value={gratitude}
                 onChange={setGratitude}
@@ -219,8 +339,8 @@ export default function Today() {
 
             {props.showFlashbacks && (
                 <div className="mt-2 grid gap-4 md:grid-cols-2">
-                    <FlashbackCard title="1 week ago" flashback={props.flashbacks.weekAgo} />
-                    <FlashbackCard title="1 year ago" flashback={props.flashbacks.yearAgo} />
+                    <FlashbackCard title="1 week ago" flashback={resolvedFlashbacks.weekAgo} />
+                    <FlashbackCard title="1 year ago" flashback={resolvedFlashbacks.yearAgo} />
                 </div>
             )}
         </AppShell>

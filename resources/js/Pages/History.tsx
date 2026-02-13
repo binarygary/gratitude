@@ -21,6 +21,11 @@ type PageProps = {
     };
 };
 
+function normalizeEntryDate(rawValue: string): string {
+    const match = rawValue.match(/\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : rawValue;
+}
+
 export default function History() {
     const { props } = usePage<PageProps>();
     const [localEntries, setLocalEntries] = useState<ServerEntry[]>([]);
@@ -31,7 +36,7 @@ export default function History() {
         listAllEntries().then((entries) => {
             setLocalEntries(
                 entries.map((entry) => ({
-                    entry_date: entry.entry_date,
+                    entry_date: normalizeEntryDate(entry.entry_date),
                     person_snippet: entry.person,
                     grace_snippet: entry.grace,
                     gratitude_snippet: entry.gratitude,
@@ -48,14 +53,19 @@ export default function History() {
     const mergedEntries = useMemo(() => {
         const map = new Map<string, ServerEntry>();
 
-        for (const entry of [...props.entries, ...localEntries]) {
-            const existing = map.get(entry.entry_date);
+        for (const rawEntry of [...props.entries, ...localEntries]) {
+            const entryDate = normalizeEntryDate(rawEntry.entry_date);
+            const entry = {
+                ...rawEntry,
+                entry_date: entryDate,
+            };
+            const existing = map.get(entryDate);
             if (!existing || entry.updated_at >= existing.updated_at) {
-                map.set(entry.entry_date, entry);
+                map.set(entryDate, entry);
             }
         }
 
-        return Array.from(map.values()).sort((a, b) => (a.entry_date > b.entry_date ? -1 : 1));
+        return Array.from(map.values()).sort((a, b) => b.entry_date.localeCompare(a.entry_date));
     }, [localEntries, props.entries]);
 
     const visibleEntries = useMemo(() => {
@@ -70,7 +80,7 @@ export default function History() {
             : mergedEntries;
 
         return [...filtered].sort((a, b) =>
-            sortBy === 'newest' ? (a.entry_date > b.entry_date ? -1 : 1) : a.entry_date > b.entry_date ? 1 : -1,
+            sortBy === 'newest' ? b.entry_date.localeCompare(a.entry_date) : a.entry_date.localeCompare(b.entry_date),
         );
     }, [mergedEntries, searchQuery, sortBy]);
 
@@ -121,8 +131,8 @@ export default function History() {
                                         <td className="text-base-content/70">{entry.gratitude_snippet || '-'}</td>
                                         <td>
                                             <Link
-                                                href={`/today?date=${entry.entry_date}`}
-                                                className={`btn btn-sm ${entry.entry_date === todayIso() ? 'btn-primary' : 'btn-outline'}`}
+                                                href={entry.entry_date === todayIso() ? `/today?date=${entry.entry_date}` : `/history/${entry.entry_date}`}
+                                                className="btn btn-sm"
                                             >
                                                 Open
                                             </Link>

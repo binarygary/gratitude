@@ -62,6 +62,10 @@ Main routes:
 - `/history`
 - `/settings` (authenticated)
 
+Local dev helper:
+- Open `/today?seed=366` to seed anonymous entries into the browser's local Dexie DB.
+- Optional query args: `seed_local_end=YYYY-MM-DD`, `seed_local_reset=1`.
+
 ## Testing
 
 ### Run all tests

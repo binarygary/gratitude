@@ -38,15 +38,11 @@ class EntryQueries
             return null;
         }
 
-        $combined = trim(implode(' ', array_filter([
-            $entry->person,
-            $entry->grace,
-            $entry->gratitude,
-        ])));
-
         return [
             'entry_date' => (string) $entry->entry_date,
-            'snippet' => mb_strimwidth($combined, 0, 120, '...'),
+            'person' => (string) ($entry->person ?? ''),
+            'grace' => (string) ($entry->grace ?? ''),
+            'gratitude' => (string) ($entry->gratitude ?? ''),
         ];
     }
 }
