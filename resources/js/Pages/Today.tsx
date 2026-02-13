@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
 import FlashbackCard from '../Components/FlashbackCard';
 import PromptCard from '../Components/PromptCard';
-import { formatHumanDate } from '../lib/date';
 import { getEntryByDate, pushUnsyncedEntries, upsertLocalEntry } from '../lib/db';
 
 type Entry = {
@@ -38,6 +37,7 @@ export default function Today() {
     const [grace, setGrace] = useState('');
     const [gratitude, setGratitude] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
     const [savedCount, setSavedCount] = useState<number>(() => Number(localStorage.getItem('save_count') ?? '0'));
 
     const hasNonEmptyContent = useMemo(
@@ -91,6 +91,7 @@ export default function Today() {
             setPerson(resolved.person);
             setGrace(resolved.grace);
             setGratitude(resolved.gratitude);
+            setLastSavedAt(resolved.updatedAt);
 
             await upsertLocalEntry({
                 entry_date: props.date,
@@ -153,54 +154,71 @@ export default function Today() {
                 localStorage.setItem('save_count', `${nextCount}`);
                 setSavedCount(nextCount);
             }
+
+            setLastSavedAt(updatedAt);
         } finally {
             setIsSaving(false);
         }
     };
 
+    const formattedDate = new Date(`${props.date}T00:00:00`).toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+
     return (
         <AppShell>
             <Head title="Today" />
 
-            <div className="card bg-base-100 shadow-sm">
-                <div className="card-body">
-                    <h1 className="card-title text-2xl">Today</h1>
-                    <p className="opacity-70">{formatHumanDate(props.date)}</p>
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-4 p-6">
+                    <h1 className="text-2xl font-semibold text-base-content">Today</h1>
+                    <p className="text-sm text-base-content/70">{formattedDate}</p>
+                    <p className="text-sm text-base-content/60">Private by default. Your entries stay yours.</p>
+                    <p className="text-sm text-base-content/60">
+                        Entries stay on your device and can be exported anytime. Sign in to sync so your reflections are available across devices.
+                    </p>
                 </div>
             </div>
 
             <PromptCard
-                title="1) Who is a person you’re grateful for?"
+                title="Who are you grateful for today?"
+                helperText="Name someone who made today feel a little brighter."
                 value={person}
                 onChange={setPerson}
-                placeholder="Either by name or by the context you encountered them, write about a person you’re grateful for today."
+                placeholder="Write a few lines about them."
             />
             <PromptCard
-                title="2) What did you experience today that was a small (or large) moment of grace?"
+                title="What moment of grace did you notice?"
+                helperText="Capture one moment of kindness, beauty, or support."
                 value={grace}
                 onChange={setGrace}
-                placeholder="This could be something you witnessed, something someone did for you, or even a moment of beauty or awe that you experienced."
+                placeholder="What stood out to you?"
             />
             <PromptCard
-                title="3) What else are you grateful for?"
+                title="What else are you grateful for?"
+                helperText="Add anything else that helped you feel grounded."
                 value={gratitude}
                 onChange={setGratitude}
-                placeholder="Think about your place in the world, either physically or emotionally. This could be a part of your environment, a relationship, an aspect of yourself, or even an opportunity you have."
+                placeholder="Anything else you want to remember from today."
             />
 
-            <div className="flex items-center gap-3">
-                <button className="btn btn-primary" onClick={saveEntry} disabled={isSaving}>
-                    {isSaving ? 'Saving...' : 'Save'}
+            <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button className="btn btn-primary btn-lg w-full rounded-xl sm:w-auto" onClick={saveEntry} disabled={isSaving}>
+                    {isSaving ? 'Saving...' : 'Save entry'}
                 </button>
+                {lastSavedAt && <p className="text-sm text-base-content/70">Last saved {new Date(lastSavedAt).toLocaleTimeString()}</p>}
                 {!props.auth.user && savedCount >= props.loginPromptThreshold && (
                     <div className="alert alert-info py-2">
-                        Sync &amp; backup across devices is optional. Use the magic link in the footer.
+                        Sync and backup across devices is optional. Use the sign in button in the header.
                     </div>
                 )}
             </div>
 
             {props.showFlashbacks && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="mt-2 grid gap-4 md:grid-cols-2">
                     <FlashbackCard title="1 week ago" flashback={props.flashbacks.weekAgo} />
                     <FlashbackCard title="1 year ago" flashback={props.flashbacks.yearAgo} />
                 </div>

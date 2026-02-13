@@ -4,6 +4,11 @@ import AppShell from '../Components/AppShell';
 
 type PageProps = {
     show_flashbacks: boolean;
+    auth: {
+        user: {
+            email: string;
+        } | null;
+    };
 };
 
 export default function Settings() {
@@ -55,9 +60,9 @@ export default function Settings() {
         <AppShell>
             <Head title="Settings" />
 
-            <div className="card bg-base-100 shadow-sm">
-                <div className="card-body gap-4">
-                    <h1 className="card-title text-2xl">Settings</h1>
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-4 p-6">
+                    <h1 className="text-3xl font-semibold text-base-content">Settings</h1>
 
                     <label className="label cursor-pointer justify-start gap-3">
                         <input
@@ -66,11 +71,12 @@ export default function Settings() {
                             checked={form.data.show_flashbacks}
                             onChange={(event) => form.setData('show_flashbacks', event.target.checked)}
                         />
-                        <span className="label-text">Show flashbacks</span>
+                        <span className="label-text text-base-content">Show flashbacks</span>
                     </label>
+                    <p className="text-sm text-base-content/60">Enable or hide historical reflection cards on your Today page.</p>
 
                     <button
-                        className="btn btn-primary w-fit"
+                        className="btn btn-primary w-fit rounded-xl"
                         onClick={() => form.post('/settings', { preserveScroll: true })}
                         disabled={form.processing}
                     >
@@ -79,16 +85,31 @@ export default function Settings() {
                 </div>
             </div>
 
-            <div className="card bg-base-100 shadow-sm">
-                <div className="card-body">
-                    <h2 className="card-title">Reminders</h2>
-                    <p>Choose a daily reminder time, then add it to your calendar.</p>
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-3 p-6">
+                    <h2 className="text-lg font-medium text-base-content">Account</h2>
+                    <p className="text-sm text-base-content/60">{props.auth.user?.email ?? 'Not signed in'}</p>
+                </div>
+            </div>
+
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-3 p-6">
+                    <h2 className="text-lg font-medium text-base-content">Privacy</h2>
+                    <p className="text-sm text-base-content/70">Entries are private.</p>
+                    <p className="text-sm text-base-content/60">Export anytime.</p>
+                </div>
+            </div>
+
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-4 p-6">
+                    <h2 className="text-lg font-medium text-base-content">Reminders</h2>
+                    <p className="text-sm text-base-content/60">Coming later. You can still add a daily reminder to your calendar today.</p>
 
                     <label className="form-control w-full max-w-xs gap-2">
-                        <span className="label-text">Reminder time</span>
+                        <span className="label-text text-base-content">Reminder time</span>
                         <input
                             type="time"
-                            className="input input-bordered"
+                            className="input input-bordered rounded-xl"
                             value={reminderTime}
                             onChange={(event) => setReminderTime(event.target.value)}
                         />
