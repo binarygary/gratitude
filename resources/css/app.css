@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@plugin 'daisyui' {
+    themes: retro --default;
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.ts';
+@source '../**/*.tsx';
