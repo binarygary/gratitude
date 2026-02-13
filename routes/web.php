@@ -18,7 +18,7 @@ Route::middleware('throttle:5,15')->group(function () {
 });
 
 Route::get('/auth/magic-link/{token}', [MagicLinkController::class, 'consume'])
-    ->middleware('signed')
+    ->middleware('signed:relative')
     ->name('auth.magic.consume');
 Route::post('/logout', [MagicLinkController::class, 'logout'])
     ->middleware('auth')
