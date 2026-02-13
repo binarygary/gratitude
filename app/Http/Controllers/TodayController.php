@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Queries\EntryQueries;
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,11 +14,17 @@ class TodayController extends Controller
     public function show(Request $request, EntryQueries $entryQueries): Response
     {
         $user = $request->user();
+        $timezone = $user?->timezone ?? config('app.timezone', 'UTC');
+        $requestedDate = $request->query('date');
 
-        if ($user !== null) {
-            $date = Carbon::now($user->timezone)->startOfDay();
+        if (is_string($requestedDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requestedDate) === 1) {
+            try {
+                $date = Carbon::createFromFormat('Y-m-d', $requestedDate, $timezone)->startOfDay();
+            } catch (InvalidFormatException) {
+                $date = Carbon::now($timezone)->startOfDay();
+            }
         } else {
-            $date = Carbon::now()->startOfDay();
+            $date = Carbon::now($timezone)->startOfDay();
         }
 
         $entry = null;

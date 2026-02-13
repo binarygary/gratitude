@@ -1,4 +1,5 @@
 import { formatHumanDate } from '../lib/date';
+import { Link } from '@inertiajs/react';
 
 type Flashback = {
     entry_date: string;
@@ -14,24 +15,30 @@ type Props = {
 
 export default function FlashbackCard({ title, flashback }: Props) {
     return (
-        <div className="card bg-base-100 shadow-sm">
-            <div className="card-body">
-                <h3 className="card-title text-lg">{title}</h3>
+        <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card-body gap-3 p-5">
+                <h3 className="text-base font-medium text-base-content">{title}</h3>
                 {flashback ? (
                     <>
-                        <p className="text-sm opacity-70">{formatHumanDate(flashback.entry_date)}</p>
-                        <p>
-                            <span className="font-semibold">Person:</span> {flashback.person.trim() || '-'}
+                        <p className="text-sm text-base-content/60">{formatHumanDate(flashback.entry_date)}</p>
+                        <p className="text-sm text-base-content/80">
+                            <span className="font-semibold text-base-content">Person:</span> {flashback.person.trim() || '-'}
                         </p>
-                        <p>
-                            <span className="font-semibold">Grace:</span> {flashback.grace.trim() || '-'}
+                        <p className="text-sm text-base-content/80">
+                            <span className="font-semibold text-base-content">Grace:</span> {flashback.grace.trim() || '-'}
                         </p>
-                        <p>
-                            <span className="font-semibold">Gratitude:</span> {flashback.gratitude.trim() || '-'}
+                        <p className="text-sm text-base-content/80">
+                            <span className="font-semibold text-base-content">Gratitude:</span> {flashback.gratitude.trim() || '-'}
                         </p>
+                        <Link href={`/today?date=${flashback.entry_date}`} className="btn btn-ghost btn-sm w-fit">
+                            Open reflection
+                        </Link>
                     </>
                 ) : (
-                    <p className="opacity-70">No entry yet.</p>
+                    <>
+                        <p className="text-sm text-base-content/70">No reflection from this day yet.</p>
+                        <p className="text-sm text-base-content/55">Come back soon — these will start to stack.</p>
+                    </>
                 )}
             </div>
         </div>
