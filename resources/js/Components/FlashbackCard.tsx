@@ -2,7 +2,9 @@ import { formatHumanDate } from '../lib/date';
 
 type Flashback = {
     entry_date: string;
-    snippet: string;
+    person: string;
+    grace: string;
+    gratitude: string;
 } | null;
 
 type Props = {
@@ -18,7 +20,15 @@ export default function FlashbackCard({ title, flashback }: Props) {
                 {flashback ? (
                     <>
                         <p className="text-sm opacity-70">{formatHumanDate(flashback.entry_date)}</p>
-                        <p>{flashback.snippet}</p>
+                        <p>
+                            <span className="font-semibold">Person:</span> {flashback.person.trim() || '-'}
+                        </p>
+                        <p>
+                            <span className="font-semibold">Grace:</span> {flashback.grace.trim() || '-'}
+                        </p>
+                        <p>
+                            <span className="font-semibold">Gratitude:</span> {flashback.gratitude.trim() || '-'}
+                        </p>
                     </>
                 ) : (
                     <p className="opacity-70">No entry yet.</p>

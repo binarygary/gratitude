@@ -13,11 +13,8 @@ class TodayController extends Controller
     public function show(Request $request, EntryQueries $entryQueries): Response
     {
         $user = $request->user();
-        $queryDate = $request->query('date');
 
-        if ($queryDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $queryDate) === 1) {
-            $date = Carbon::parse($queryDate)->startOfDay();
-        } elseif ($user !== null) {
+        if ($user !== null) {
             $date = Carbon::now($user->timezone)->startOfDay();
         } else {
             $date = Carbon::now()->startOfDay();

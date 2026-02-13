@@ -82,7 +82,7 @@ export default function History() {
                                         <td>{entry.grace_snippet || '-'}</td>
                                         <td>{entry.gratitude_snippet || '-'}</td>
                                         <td>
-                                            <Link href={`/today?date=${entry.entry_date}`} className="btn btn-sm">
+                                            <Link href={`/history/${entry.entry_date}`} className="btn btn-sm">
                                                 Open
                                             </Link>
                                         </td>
