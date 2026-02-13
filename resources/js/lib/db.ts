@@ -45,18 +45,23 @@ export async function getEntryByDate(entryDate: string): Promise<LocalEntry | un
 export async function upsertLocalEntry(
     payload: Omit<LocalEntry, 'local_id'> & { local_id?: string },
 ): Promise<LocalEntry> {
-    const existing = await getEntryByDate(payload.entry_date);
+    const entryDate = payload.entry_date ?? payload.server_entry_date;
+    if (!entryDate) {
+        throw new Error('entry_date is required to upsert a local entry');
+    }
+
+    const existing = await getEntryByDate(entryDate);
     const localId = payload.local_id ?? existing?.local_id ?? crypto.randomUUID();
 
     const record: LocalEntry = {
         local_id: localId,
-        entry_date: payload.entry_date,
+        entry_date: entryDate,
         person: payload.person,
         grace: payload.grace,
         gratitude: payload.gratitude,
         updated_at: payload.updated_at,
         synced_at: payload.synced_at,
-        server_entry_date: payload.server_entry_date,
+        server_entry_date: payload.server_entry_date ?? entryDate,
     };
 
     await db.entries.put(record);

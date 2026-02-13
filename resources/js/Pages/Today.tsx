@@ -127,7 +127,7 @@ export default function Today() {
                 gratitude,
                 updated_at: updatedAt,
                 synced_at: null,
-                server_entry_date: null,
+                server_entry_date: props.date,
             });
 
             if (props.auth.user) {
