@@ -101,7 +101,7 @@ export default function AppShell({ children }: Props) {
                     <Link href="/settings" className="text-sm text-base-content/60 hover:text-base-content">
                         Export
                     </Link>
-                    <Link href="/settings" className="text-sm text-base-content/60 hover:text-base-content">
+                    <Link href="/help" className="text-sm text-base-content/60 hover:text-base-content">
                         Help
                     </Link>
                 </div>
