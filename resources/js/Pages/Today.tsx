@@ -170,22 +170,22 @@ export default function Today() {
             </div>
 
             <PromptCard
-                title="1) Person"
+                title="1) Who is a person you’re grateful for?"
                 value={person}
                 onChange={setPerson}
-                placeholder="Who are you grateful for today?"
+                placeholder="Either by name or by the context you encountered them, write about a person you’re grateful for today."
             />
             <PromptCard
-                title="2) Grace"
+                title="2) What did you experience today that was a small (or large) moment of grace?"
                 value={grace}
                 onChange={setGrace}
-                placeholder="What grace did you notice?"
+                placeholder="This could be something you witnessed, something someone did for you, or even a moment of beauty or awe that you experienced."
             />
             <PromptCard
-                title="3) Gratitude"
+                title="3) What else are you grateful for?"
                 value={gratitude}
                 onChange={setGratitude}
-                placeholder="What are you thankful for right now?"
+                placeholder="Think about your place in the world, either physically or emotionally. This could be a part of your environment, a relationship, an aspect of yourself, or even an opportunity you have."
             />
 
             <div className="flex items-center gap-3">
