@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -28,7 +29,9 @@ class MagicLinkController extends Controller
             ['email' => $email],
             [
                 'name' => Str::headline(Str::before($email, '@')),
-                'password' => null,
+                // Keep magic-link accounts passwordless in practice while satisfying
+                // legacy schemas where users.password is still NOT NULL.
+                'password' => Hash::make(Str::random(64)),
             ],
         );
 
