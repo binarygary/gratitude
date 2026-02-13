@@ -44,11 +44,13 @@ class MagicLinkController extends Controller
             'expires_at' => $expiresAt,
         ]);
 
-        $url = URL::temporarySignedRoute(
+        $relativeSignedPath = URL::temporarySignedRoute(
             'auth.magic.consume',
             $expiresAt,
             ['token' => $rawToken],
+            absolute: false,
         );
+        $url = url($relativeSignedPath);
 
         Mail::to($email)->send(new MagicLinkMail($url));
 
