@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
-import { formatHumanDate } from '../lib/date';
+import { formatHumanDate, todayIso } from '../lib/date';
 import { listAllEntries, pushUnsyncedEntries } from '../lib/db';
 
 type ServerEntry = {
@@ -24,6 +24,8 @@ type PageProps = {
 export default function History() {
     const { props } = usePage<PageProps>();
     const [localEntries, setLocalEntries] = useState<ServerEntry[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
 
     useEffect(() => {
         listAllEntries().then((entries) => {
@@ -56,15 +58,51 @@ export default function History() {
         return Array.from(map.values()).sort((a, b) => (a.entry_date > b.entry_date ? -1 : 1));
     }, [localEntries, props.entries]);
 
+    const visibleEntries = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+        const filtered = query
+            ? mergedEntries.filter((entry) =>
+                  [entry.entry_date, entry.person_snippet, entry.grace_snippet, entry.gratitude_snippet]
+                      .join(' ')
+                      .toLowerCase()
+                      .includes(query),
+              )
+            : mergedEntries;
+
+        return [...filtered].sort((a, b) =>
+            sortBy === 'newest' ? (a.entry_date > b.entry_date ? -1 : 1) : a.entry_date > b.entry_date ? 1 : -1,
+        );
+    }, [mergedEntries, searchQuery, sortBy]);
+
     return (
         <AppShell>
             <Head title="History" />
 
-            <div className="card bg-base-100 shadow-sm">
-                <div className="card-body">
-                    <h1 className="card-title text-2xl">History</h1>
+            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+                <div className="card-body gap-5 p-6">
+                    <h1 className="text-3xl font-semibold text-base-content">History</h1>
+                    <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                        <label className="input input-bordered flex items-center gap-2 rounded-xl">
+                            <span className="text-sm text-base-content/55">Search</span>
+                            <input
+                                type="search"
+                                className="grow"
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
+                                placeholder="Search by date or snippet"
+                            />
+                        </label>
+                        <select
+                            className="select select-bordered rounded-xl"
+                            value={sortBy}
+                            onChange={(event) => setSortBy(event.target.value as 'newest' | 'oldest')}
+                        >
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                        </select>
+                    </div>
                     <div className="overflow-x-auto">
-                        <table className="table table-zebra">
+                        <table className="table table-md">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -75,14 +113,17 @@ export default function History() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {mergedEntries.map((entry) => (
+                                {visibleEntries.map((entry) => (
                                     <tr key={entry.entry_date}>
-                                        <td>{formatHumanDate(entry.entry_date)}</td>
-                                        <td>{entry.person_snippet || '-'}</td>
-                                        <td>{entry.grace_snippet || '-'}</td>
-                                        <td>{entry.gratitude_snippet || '-'}</td>
+                                        <td className="font-medium text-base-content">{formatHumanDate(entry.entry_date)}</td>
+                                        <td className="text-base-content/70">{entry.person_snippet || '-'}</td>
+                                        <td className="text-base-content/70">{entry.grace_snippet || '-'}</td>
+                                        <td className="text-base-content/70">{entry.gratitude_snippet || '-'}</td>
                                         <td>
-                                            <Link href={`/today?date=${entry.entry_date}`} className="btn btn-sm">
+                                            <Link
+                                                href={`/today?date=${entry.entry_date}`}
+                                                className={`btn btn-sm ${entry.entry_date === todayIso() ? 'btn-primary' : 'btn-outline'}`}
+                                            >
                                                 Open
                                             </Link>
                                         </td>
@@ -91,7 +132,7 @@ export default function History() {
                             </tbody>
                         </table>
                     </div>
-                    {mergedEntries.length === 0 && <p className="opacity-70">No entries yet.</p>}
+                    {visibleEntries.length === 0 && <p className="text-sm text-base-content/60">No entries yet.</p>}
                 </div>
             </div>
         </AppShell>

@@ -3,6 +3,16 @@
     themes: retro --default;
 }
 
+[data-theme='retro'] {
+    /* Softer retro accents: keep hue family, lower chroma/saturation. */
+    --color-primary: oklch(76% 0.082 19.571);
+    --color-primary-content: oklch(34% 0.095 25.723);
+    --color-secondary: oklch(89% 0.052 155.995);
+    --color-secondary-content: oklch(38% 0.082 151.328);
+    --color-accent: oklch(66% 0.108 75.834);
+    --color-accent-content: oklch(35% 0.082 45.904);
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
