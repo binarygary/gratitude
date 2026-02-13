@@ -1,5 +1,6 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { exportEntries } from '../lib/export';
 
 type Props = {
     children: ReactNode;
@@ -21,8 +22,24 @@ export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
+    const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
+    const [exportStatus, setExportStatus] = useState<string | null>(null);
 
     const loginForm = useForm({ email: '' });
+
+    const handleExport = async (format: 'json' | 'pdf' | 'csv') => {
+        setExporting(format);
+        setExportStatus(null);
+
+        try {
+            const entryCount = await exportEntries(format);
+            setExportStatus(`Exported ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} as ${format.toUpperCase()}.`);
+        } catch {
+            setExportStatus('Export failed. Please try again.');
+        } finally {
+            setExporting(false);
+        }
+    };
 
     return (
         <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
@@ -93,14 +110,34 @@ export default function AppShell({ children }: Props) {
             </div>
 
             {flashStatus && <div className="alert alert-info mb-4">{flashStatus}</div>}
+            {exportStatus && <div className="alert alert-info mb-4">{exportStatus}</div>}
 
             <main className="flex-1 space-y-8">{children}</main>
 
             <footer className="mt-8 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                    <Link href="/settings" className="text-sm text-base-content/60 hover:text-base-content">
-                        Export
-                    </Link>
+                    <div className="dropdown dropdown-top">
+                        <button className="text-sm text-base-content/60 hover:text-base-content" tabIndex={0}>
+                            {exporting ? 'Exporting...' : 'Export'}
+                        </button>
+                        <ul className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
+                            <li>
+                                <button type="button" onClick={() => handleExport('json')} disabled={Boolean(exporting)}>
+                                    JSON
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" onClick={() => handleExport('pdf')} disabled={Boolean(exporting)}>
+                                    PDF
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" onClick={() => handleExport('csv')} disabled={Boolean(exporting)}>
+                                    CSV
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                     <Link href="/settings" className="text-sm text-base-content/60 hover:text-base-content">
                         Help
                     </Link>
