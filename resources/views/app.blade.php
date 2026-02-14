@@ -68,7 +68,7 @@
         <meta name="twitter:url" content="{{ $canonical }}">
 
         <title inertia>{{ $metaTitle }}</title>
-        @vite(['resources/css/app.css', 'resources/js/app.tsx'])
+        @vite(['resources/js/app.tsx'])
         @inertiaHead
     </head>
     <body class="min-h-screen bg-base-100 text-base-content">
