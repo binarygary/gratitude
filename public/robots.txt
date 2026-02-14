@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Disallow: /today
+Disallow: /history
+Disallow: /settings
+Disallow: /auth/
+Disallow: /api/
+Allow: /help
+Allow: /policies
+
+Sitemap: https://consider.today/sitemap.xml

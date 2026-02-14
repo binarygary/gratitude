@@ -1,9 +1,10 @@
-import { Head, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AppShell from '../Components/AppShell';
 import FlashbackCard from '../Components/FlashbackCard';
 import PromptCard from '../Components/PromptCard';
+import SeoHead from '../Components/SeoHead';
 import { getEntryByDate, pushUnsyncedEntries, seedLocalEntries, upsertLocalEntry } from '../lib/db';
 
 type Entry = {
@@ -277,7 +278,12 @@ export default function Today() {
 
     return (
         <AppShell>
-            <Head title="Today" />
+            <SeoHead
+                title="Today"
+                description="Write your daily gratitude reflection in three short prompts. Entries are private by default and stored locally first."
+                canonicalPath="/today"
+                noIndex
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">

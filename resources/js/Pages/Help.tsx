@@ -1,11 +1,15 @@
-import { Head } from '@inertiajs/react';
 import AppShell from '../Components/AppShell';
 import BrandName from '../Components/BrandName';
+import SeoHead from '../Components/SeoHead';
 
 export default function Help() {
     return (
         <AppShell>
-            <Head title="Help" />
+            <SeoHead
+                title="Help"
+                description="Learn how consider.today stores entries, sync works, and how to use local-first reflection features."
+                canonicalPath="/help"
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">

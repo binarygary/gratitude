@@ -1,7 +1,8 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import AppShell from '../Components/AppShell';
+import SeoHead from '../Components/SeoHead';
 import { formatHumanDate } from '../lib/date';
 import { getEntryByDate } from '../lib/db';
 
@@ -87,7 +88,12 @@ export default function HistoryEntry() {
 
     return (
         <AppShell>
-            <Head title={formattedDate} />
+            <SeoHead
+                title={formattedDate}
+                description="Read a previously saved daily reflection."
+                canonicalPath={`/history/${props.date}`}
+                noIndex
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">

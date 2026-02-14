@@ -29,6 +29,9 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
             ],
+            'seo' => [
+                'base_url' => config('app.url'),
+            ],
         ]);
     }
 }

@@ -77,14 +77,23 @@ export default function AppShell({ children }: Props) {
                     </Link>
                     {authUser ? (
                         <div className="dropdown dropdown-end">
-                            <button className="btn btn-sm btn-ghost rounded-full" aria-label="Account menu">
+                            <button
+                                className="btn btn-sm btn-ghost rounded-full"
+                                type="button"
+                                aria-label="Account menu"
+                                aria-haspopup="menu"
+                                aria-controls="account-menu"
+                            >
                                 <span className="avatar avatar-placeholder">
                                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-base-200 text-xs font-semibold text-base-content">
                                         {authUser.name?.[0] ?? authUser.email[0]?.toUpperCase()}
                                     </span>
                                 </span>
                             </button>
-                            <ul className="menu dropdown-content z-10 mt-2 w-52 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
+                            <ul
+                                id="account-menu"
+                                className="menu dropdown-content z-10 mt-2 w-52 rounded-box border border-base-300/50 bg-white p-2 shadow-sm"
+                            >
                                 <li>
                                     <Link href="/settings">Account settings</Link>
                                 </li>
@@ -97,10 +106,18 @@ export default function AppShell({ children }: Props) {
                         </div>
                     ) : (
                         <div className="relative" ref={loginDropdownRef}>
-                            <button className="btn btn-sm btn-primary" type="button" onClick={() => setIsLoginOpen((open) => !open)}>
+                            <button
+                                className="btn btn-sm btn-primary"
+                                type="button"
+                                aria-haspopup="dialog"
+                                aria-expanded={isLoginOpen}
+                                aria-controls="sign-in-menu"
+                                onClick={() => setIsLoginOpen((open) => !open)}
+                            >
                                 Sign in
                             </button>
                             <form
+                                id="sign-in-menu"
                                 className={`absolute right-0 z-10 mt-2 w-72 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm ${
                                     isLoginOpen ? 'block' : 'hidden'
                                 }`}
@@ -135,18 +152,32 @@ export default function AppShell({ children }: Props) {
                 </div>
             </div>
 
-            {flashStatus && <div className="alert alert-info mb-4">{flashStatus}</div>}
-            {exportStatus && <div className="alert alert-info mb-4">{exportStatus}</div>}
+            {flashStatus && (
+                <div className="alert alert-info mb-4" role="status" aria-live="polite">
+                    {flashStatus}
+                </div>
+            )}
+            {exportStatus && (
+                <div className="alert alert-info mb-4" role="status" aria-live="polite">
+                    {exportStatus}
+                </div>
+            )}
 
             <main className="flex-1 space-y-8">{children}</main>
 
             <footer className="footer mt-8 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-base-300/50 py-3 text-sm">
                 <div className="flex flex-wrap items-center gap-2 text-base-content/60">
                     <div className="dropdown dropdown-top">
-                        <button className="link link-hover text-sm font-normal text-base-content/60 no-underline" tabIndex={0}>
+                        <button
+                            className="link link-hover text-sm font-normal text-base-content/60 no-underline"
+                            type="button"
+                            tabIndex={0}
+                            aria-haspopup="menu"
+                            aria-controls="export-menu"
+                        >
                             {exporting ? 'Exporting...' : 'Export'}
                         </button>
-                        <ul className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
+                        <ul id="export-menu" className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
                             <li>
                                 <button type="button" onClick={() => handleExport('json')} disabled={Boolean(exporting)}>
                                     JSON

@@ -1,6 +1,7 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
+import SeoHead from '../Components/SeoHead';
 import { formatHumanDate, normalizeEntryDate, todayIso } from '../lib/date';
 import { listAllEntries, pushUnsyncedEntries } from '../lib/db';
 
@@ -81,7 +82,12 @@ export default function History() {
 
     return (
         <AppShell>
-            <Head title="History" />
+            <SeoHead
+                title="History"
+                description="Review your past gratitude entries and open any day to revisit your reflections."
+                canonicalPath="/history"
+                noIndex
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-5 p-6">
@@ -97,7 +103,11 @@ export default function History() {
                                 placeholder="Search by date or snippet"
                             />
                         </label>
+                        <label htmlFor="history-sort" className="sr-only">
+                            Sort entries
+                        </label>
                         <select
+                            id="history-sort"
                             className="select select-bordered rounded-xl"
                             value={sortBy}
                             onChange={(event) => setSortBy(event.target.value as 'newest' | 'oldest')}
@@ -110,11 +120,13 @@ export default function History() {
                         <table className="table table-md">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Person</th>
-                                    <th>Grace</th>
-                                    <th>Gratitude</th>
-                                    <th></th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Person</th>
+                                    <th scope="col">Grace</th>
+                                    <th scope="col">Gratitude</th>
+                                    <th scope="col">
+                                        <span className="sr-only">Actions</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>

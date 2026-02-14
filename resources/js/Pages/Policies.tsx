@@ -1,7 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import AppShell from '../Components/AppShell';
 import BrandName from '../Components/BrandName';
+import SeoHead from '../Components/SeoHead';
 
 const effectiveDate = 'February 14, 2026';
 
@@ -27,7 +28,11 @@ function Section({
 export default function Policies() {
     return (
         <AppShell>
-            <Head title="Policies" />
+            <SeoHead
+                title="Policies"
+                description="Privacy policy, terms of service, data retention, and security information for consider.today."
+                canonicalPath="/policies"
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">

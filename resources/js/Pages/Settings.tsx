@@ -1,6 +1,7 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
+import SeoHead from '../Components/SeoHead';
 
 type PageProps = {
     show_flashbacks: boolean;
@@ -58,7 +59,12 @@ export default function Settings() {
 
     return (
         <AppShell>
-            <Head title="Settings" />
+            <SeoHead
+                title="Settings"
+                description="Manage reflection settings, reminders, and account preferences."
+                canonicalPath="/settings"
+                noIndex
+            />
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">
