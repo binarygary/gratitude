@@ -6,6 +6,7 @@ use App\Http\Controllers\EntryController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HistoryEntryController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\PoliciesController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TodayController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,8 @@ Route::redirect('/', '/today');
 Route::get('/today', [TodayController::class, 'show'])->name('today.show');
 Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
 Route::get('/help', [HelpController::class, 'show'])->name('help.show');
+Route::get('/policies', [PoliciesController::class, 'show'])->name('policies.show');
+Route::redirect('/privacy', '/policies#privacy')->name('privacy.show');
 Route::get('/history/{date}', [HistoryEntryController::class, 'show'])
     ->where('date', '\d{4}-\d{2}-\d{2}')
     ->name('history.entry.show');

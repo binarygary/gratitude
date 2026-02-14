@@ -284,7 +284,7 @@ export default function Today() {
                     <h1 className="text-2xl font-semibold text-base-content">Today</h1>
                     <p className="text-sm text-base-content/70">{formattedDate}</p>
                     <p className="text-sm text-base-content/60">This is your 3-prompt gratitude journal.</p>
-                    <p className="text-sm text-base-content/60">Private by default. Your entries stay on your local machine until you decide otherwise.</p>
+                    <p className="text-sm text-base-content/60">Private by default. Your entries stay on your local device until you decide otherwise.</p>
                     <p className="text-sm text-base-content/60">
                         Entries can be exported anytime. Sign in to sync so your reflections are available across devices.
                     </p>
