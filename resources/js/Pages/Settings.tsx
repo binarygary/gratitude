@@ -79,7 +79,7 @@ export default function Settings() {
                         />
                         <span className="label-text text-base-content">Show flashbacks</span>
                     </label>
-                    <p className="text-sm text-base-content/60">Enable or hide historical reflection cards on your Today page.</p>
+                    <p className="text-sm text-base-content/70">Enable or hide historical reflection cards on your Today page.</p>
 
                     <button
                         className="btn btn-primary w-fit rounded-xl"
@@ -94,14 +94,14 @@ export default function Settings() {
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-3 p-6">
                     <h2 className="text-lg font-medium text-base-content">Account</h2>
-                    <p className="text-sm text-base-content/60">{props.auth.user?.email ?? 'Not signed in'}</p>
+                    <p className="text-sm text-base-content/70">{props.auth.user?.email ?? 'Not signed in'}</p>
                 </div>
             </div>
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h2 className="text-lg font-medium text-base-content">Reminders</h2>
-                    <p className="text-sm text-base-content/60">Coming later. You can still add a daily reminder to your calendar today.</p>
+                    <p className="text-sm text-base-content/70">Coming later. You can still add a daily reminder to your calendar today.</p>
 
                     <label className="form-control w-full max-w-xs gap-2">
                         <span className="label-text text-base-content">Reminder time</span>

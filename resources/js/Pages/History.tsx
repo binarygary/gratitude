@@ -94,7 +94,7 @@ export default function History() {
                     <h1 className="text-3xl font-semibold text-base-content">History</h1>
                     <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
                         <label className="input input-bordered flex items-center gap-2 rounded-xl">
-                            <span className="text-sm text-base-content/55">Search</span>
+                            <span className="text-sm text-base-content/70">Search</span>
                             <input
                                 type="search"
                                 className="grow"
@@ -149,7 +149,7 @@ export default function History() {
                             </tbody>
                         </table>
                     </div>
-                    {visibleEntries.length === 0 && <p className="text-sm text-base-content/60">No entries yet.</p>}
+                    {visibleEntries.length === 0 && <p className="text-sm text-base-content/70">No entries yet.</p>}
                 </div>
             </div>
         </AppShell>

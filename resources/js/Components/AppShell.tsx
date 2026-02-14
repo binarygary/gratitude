@@ -133,7 +133,7 @@ export default function AppShell({ children }: Props) {
                                 }}
                             >
                                 <label className="form-control gap-2">
-                                    <span className="text-sm text-base-content/60">Email</span>
+                                    <span className="text-sm text-base-content/70">Email</span>
                                     <input
                                         type="email"
                                         className="input input-bordered w-full"
@@ -166,10 +166,10 @@ export default function AppShell({ children }: Props) {
             <main className="flex-1 space-y-8">{children}</main>
 
             <footer className="footer mt-8 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-base-300/50 py-3 text-sm">
-                <div className="flex flex-wrap items-center gap-2 text-base-content/60">
+                <div className="flex flex-wrap items-center gap-2 text-base-content/70">
                     <div className="dropdown dropdown-top">
                         <button
-                            className="link link-hover text-sm font-normal text-base-content/60 no-underline"
+                            className="link link-hover text-sm font-normal text-base-content/70 no-underline"
                             type="button"
                             tabIndex={0}
                             aria-haspopup="menu"
@@ -195,20 +195,20 @@ export default function AppShell({ children }: Props) {
                             </li>
                         </ul>
                     </div>
-                    <span className="text-base-content/40">&middot;</span>
-                    <Link href="/help" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
+                    <span className="text-base-content/70">&middot;</span>
+                    <Link href="/help" className="link link-hover text-sm font-normal text-base-content/70 no-underline">
                         Help
                     </Link>
-                    <span className="text-base-content/40">&middot;</span>
-                    <Link href="/policies#privacy" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
+                    <span className="text-base-content/70">&middot;</span>
+                    <Link href="/policies#privacy" className="link link-hover text-sm font-normal text-base-content/70 no-underline">
                         Policies
                     </Link>
-                    <span className="text-base-content/40">&middot;</span>
-                    <a href="mailto:support@consider.today" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
+                    <span className="text-base-content/70">&middot;</span>
+                    <a href="mailto:support@consider.today" className="link link-hover text-sm font-normal text-base-content/70 no-underline">
                         support@consider.today
                     </a>
                 </div>
-                <p className="w-full text-sm font-normal text-base-content/55 sm:w-auto sm:text-right">I&apos;m grateful for you.</p>
+                <p className="w-full text-sm font-normal text-base-content/70 sm:w-auto sm:text-right">I&apos;m grateful for you.</p>
             </footer>
         </div>
     );

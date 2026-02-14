@@ -19,7 +19,7 @@ export default function FlashbackCard({ title, flashback }: Props) {
                 <h3 className="text-base font-medium text-base-content">{title}</h3>
                 {flashback ? (
                     <>
-                        <p className="text-sm text-base-content/60">{formatHumanDate(flashback.entry_date)}</p>
+                        <p className="text-sm text-base-content/70">{formatHumanDate(flashback.entry_date)}</p>
                         <p className="text-sm text-base-content/80">
                             <span className="font-semibold text-base-content">Who:</span> {flashback.person.trim() || '-'}
                         </p>
@@ -33,7 +33,7 @@ export default function FlashbackCard({ title, flashback }: Props) {
                 ) : (
                     <>
                         <p className="text-sm text-base-content/70">No reflection from this day yet.</p>
-                        <p className="text-sm text-base-content/55">Come back soon — these will start to stack.</p>
+                        <p className="text-sm text-base-content/70">Come back soon — these will start to stack.</p>
                     </>
                 )}
             </div>

@@ -19,7 +19,7 @@ export default function PromptCard({ title, helperText, value, onChange, placeho
                     {title}
                 </h2>
                 {helperText && (
-                    <p id={helperTextId} className="text-sm text-base-content/60">
+                    <p id={helperTextId} className="text-sm text-base-content/70">
                         {helperText}
                     </p>
                 )}

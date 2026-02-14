@@ -289,9 +289,9 @@ export default function Today() {
                 <div className="card-body gap-4 p-6">
                     <h1 className="text-2xl font-semibold text-base-content">Today</h1>
                     <p className="text-sm text-base-content/70">{formattedDate}</p>
-                    <p className="text-sm text-base-content/60">This is your 3-prompt gratitude journal.</p>
-                    <p className="text-sm text-base-content/60">Private by default. Your entries stay on your local device until you decide otherwise.</p>
-                    <p className="text-sm text-base-content/60">
+                    <p className="text-sm text-base-content/70">This is your 3-prompt gratitude journal.</p>
+                    <p className="text-sm text-base-content/70">Private by default. Your entries stay on your local device until you decide otherwise.</p>
+                    <p className="text-sm text-base-content/70">
                         Entries can be exported anytime. Sign in to sync so your reflections are available across devices.
                     </p>
                     {seedMessage && <p className="text-sm text-success">{seedMessage}</p>}
