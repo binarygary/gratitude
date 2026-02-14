@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
-import { formatHumanDate, todayIso } from '../lib/date';
+import { formatHumanDate, normalizeEntryDate, todayIso } from '../lib/date';
 import { listAllEntries, pushUnsyncedEntries } from '../lib/db';
 
 type ServerEntry = {
@@ -20,11 +20,6 @@ type PageProps = {
         } | null;
     };
 };
-
-function normalizeEntryDate(rawValue: string): string {
-    const match = rawValue.match(/\d{4}-\d{2}-\d{2}/);
-    return match ? match[0] : rawValue;
-}
 
 export default function History() {
     const { props } = usePage<PageProps>();
