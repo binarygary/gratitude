@@ -1,5 +1,5 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import BrandName from './BrandName';
 import { exportEntries } from '../lib/export';
 
@@ -25,8 +25,26 @@ export default function AppShell({ children }: Props) {
     const flashStatus = props.flash?.status;
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const loginDropdownRef = useRef<HTMLDivElement | null>(null);
 
     const loginForm = useForm({ email: '' });
+
+    useEffect(() => {
+        const handleOutsidePress = (event: MouseEvent | TouchEvent) => {
+            if (!loginDropdownRef.current?.contains(event.target as Node)) {
+                setIsLoginOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsidePress);
+        document.addEventListener('touchstart', handleOutsidePress);
+
+        return () => {
+            document.removeEventListener('mousedown', handleOutsidePress);
+            document.removeEventListener('touchstart', handleOutsidePress);
+        };
+    }, []);
 
     const handleExport = async (format: 'json' | 'pdf' | 'csv') => {
         setExporting(format);
@@ -78,15 +96,22 @@ export default function AppShell({ children }: Props) {
                             </ul>
                         </div>
                     ) : (
-                        <div className="dropdown dropdown-end">
-                            <button className="btn btn-sm btn-primary">Sign in</button>
+                        <div className="relative" ref={loginDropdownRef}>
+                            <button className="btn btn-sm btn-primary" type="button" onClick={() => setIsLoginOpen((open) => !open)}>
+                                Sign in
+                            </button>
                             <form
-                                className="dropdown-content z-10 mt-2 w-72 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm"
+                                className={`absolute right-0 z-10 mt-2 w-72 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm ${
+                                    isLoginOpen ? 'block' : 'hidden'
+                                }`}
                                 onSubmit={(event) => {
                                     event.preventDefault();
                                     loginForm.post('/auth/magic-link/request', {
                                         preserveScroll: true,
-                                        onSuccess: () => loginForm.reset('email'),
+                                        onSuccess: () => {
+                                            loginForm.reset('email');
+                                            setIsLoginOpen(false);
+                                        },
                                     });
                                 }}
                             >
