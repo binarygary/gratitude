@@ -297,7 +297,7 @@ export default function Today() {
                         <span className="font-semibold">Who</span> are you grateful for today?
                     </>
                 }
-                helperText="Name someone who made today feel a little brighter."
+                helperText="Either by name or by the context you encountered them, write about a person you’re grateful for today."
                 value={person}
                 onChange={setPerson}
                 placeholder="Write a few lines about them."
@@ -308,7 +308,7 @@ export default function Today() {
                         What moment of <span className="font-semibold">grace</span> did you notice?
                     </>
                 }
-                helperText="Capture one moment of kindness, beauty, or support."
+                helperText="This could be something you witnessed, something someone did for you, or even a moment of beauty or awe that you experienced."
                 value={grace}
                 onChange={setGrace}
                 placeholder="What stood out to you?"
@@ -319,7 +319,7 @@ export default function Today() {
                         What else are you <span className="font-semibold">grateful</span> for?
                     </>
                 }
-                helperText="Add anything else that helped you feel grounded."
+                helperText="Think about your place in the world, either physically or emotionally. This could be a part of your environment, a relationship, an aspect of yourself, or even an opportunity you have."
                 value={gratitude}
                 onChange={setGratitude}
                 placeholder="Anything else you want to remember from today."
