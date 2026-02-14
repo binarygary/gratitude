@@ -1,5 +1,5 @@
 <x-mail::message>
-# Sign in to consider<span style="display:inline-block;width:0.4em;height:0.4em;border-radius:9999px;background:var(--color-primary);vertical-align:middle;margin:0 0.2em;"></span>today
+# Sign in to consider <span style="color:#22c55e;font-size:0.9em;line-height:1;vertical-align:middle;">&#9679;</span> today
 
 Tap the button below to sign in. This link expires in 30 minutes and can be used only once.
 
