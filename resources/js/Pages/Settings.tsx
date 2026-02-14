@@ -35,20 +35,20 @@ export default function Settings() {
         const [hour = '20', minute = '00'] = reminderTime.split(':');
         const dtStart = `${year}${month}${day}T${hour}${minute}00`;
         const stamp = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-        const uid = `gratitude-daily-reminder-${safeTimezone}-${hour}${minute}`;
+        const uid = `consider-today-daily-reminder-${safeTimezone}-${hour}${minute}`;
 
         const calendar = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//Gratitude//Daily Reminder//EN',
+            'PRODID:-//consider.today//Daily Reminder//EN',
             'CALSCALE:GREGORIAN',
             'BEGIN:VEVENT',
             `UID:${uid}`,
             `DTSTAMP:${stamp}`,
             `DTSTART;TZID=${safeTimezone}:${dtStart}`,
             'RRULE:FREQ=DAILY',
-            'SUMMARY:Daily Gratitude Reminder',
-            'DESCRIPTION:Open Gratitude and write today\\,s entry.',
+            'SUMMARY:Daily consider.today reminder',
+            'DESCRIPTION:Open consider.today and write today\\,s entry.',
             'END:VEVENT',
             'END:VCALENDAR',
         ].join('\r\n');
@@ -110,7 +110,7 @@ export default function Settings() {
                     <a
                         className="btn btn-outline btn-sm w-fit"
                         href={reminderIcsHref}
-                        download="gratitude-daily-reminder.ics"
+                        download="consider-today-daily-reminder.ics"
                     >
                         Download daily reminder (.ics)
                     </a>

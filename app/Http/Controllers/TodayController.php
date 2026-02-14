@@ -15,7 +15,7 @@ class TodayController extends Controller
     {
         $user = $request->user();
         $timezone = $user?->timezone ?? config('app.timezone', 'UTC');
-        $requestedDate = $request->query('date');
+        $requestedDate = $user !== null ? $request->query('date') : null;
 
         if (is_string($requestedDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requestedDate) === 1) {
             try {

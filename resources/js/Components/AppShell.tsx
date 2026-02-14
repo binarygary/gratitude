@@ -1,5 +1,6 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState, type ReactNode } from 'react';
+import BrandName from './BrandName';
 import { exportEntries } from '../lib/export';
 
 type Props = {
@@ -46,7 +47,7 @@ export default function AppShell({ children }: Props) {
             <div className="navbar mb-8 rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="flex-1">
                     <Link href="/today" className="btn btn-ghost text-lg font-medium text-base-content">
-                        Gratitude Journal
+                        <BrandName />
                     </Link>
                 </div>
                 <div className="flex gap-2">

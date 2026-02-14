@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import AppShell from '../Components/AppShell';
+import BrandName from '../Components/BrandName';
 
 export default function Help() {
     return (
@@ -10,7 +11,7 @@ export default function Help() {
                 <div className="card-body gap-4 p-6">
                     <h1 className="text-3xl font-semibold text-base-content">Help</h1>
                     <p className="text-sm text-base-content/70">
-                        Gratitude is local-first. Your entries are stored on your device, and export is always available.
+                        <BrandName /> is local-first. Your entries are stored on your device, and export is always available.
                     </p>
                 </div>
             </div>

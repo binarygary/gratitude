@@ -1,6 +1,6 @@
-# Gratitude Journal
+# consider.today
 
-Gratitude Journal is a Laravel + Inertia (React) app for daily reflection.
+consider.today is a Laravel + Inertia (React) app for daily reflection.
 
 Core behavior:
 - Write one entry per day with three prompts: person, grace, gratitude.

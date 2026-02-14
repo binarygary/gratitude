@@ -104,7 +104,7 @@ function wrapText(text: string, maxCharsPerLine = 95): string[] {
 
 function buildPdfLines(entries: LocalEntry[]): string[] {
     const lines: string[] = [];
-    lines.push('Gratitude Journal Export');
+    lines.push('consider.today Export');
     lines.push(`Exported: ${new Date().toLocaleString()}`);
     lines.push(`Entries: ${entries.length}`);
     lines.push('');
@@ -140,7 +140,7 @@ function buildPdf(entries: LocalEntry[]): Uint8Array {
     }
 
     if (pageChunks.length === 0) {
-        pageChunks.push(['Gratitude Journal Export', 'No entries found.']);
+        pageChunks.push(['consider.today Export', 'No entries found.']);
     }
 
     const fontObjectId = 3;
@@ -210,17 +210,17 @@ export async function exportEntries(format: ExportFormat): Promise<number> {
 
     if (format === 'json') {
         const json = buildJson(entries);
-        triggerDownload(new Blob([json], { type: 'application/json;charset=utf-8' }), `gratitude-export-${stamp}.json`);
+        triggerDownload(new Blob([json], { type: 'application/json;charset=utf-8' }), `consider-today-export-${stamp}.json`);
         return entries.length;
     }
 
     if (format === 'csv') {
         const csv = buildCsv(entries);
-        triggerDownload(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `gratitude-export-${stamp}.csv`);
+        triggerDownload(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `consider-today-export-${stamp}.csv`);
         return entries.length;
     }
 
     const pdfBytes = buildPdf(entries);
-    triggerDownload(new Blob([pdfBytes], { type: 'application/pdf' }), `gratitude-export-${stamp}.pdf`);
+    triggerDownload(new Blob([pdfBytes], { type: 'application/pdf' }), `consider-today-export-${stamp}.pdf`);
     return entries.length;
 }

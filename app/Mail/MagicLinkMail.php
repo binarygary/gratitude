@@ -18,7 +18,7 @@ class MagicLinkMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Your Gratitude Journal sign-in link');
+        return new Envelope(subject: 'Your consider.today sign-in link');
     }
 
     public function content(): Content
