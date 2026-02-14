@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /today
 Disallow: /history
 Disallow: /settings
 Disallow: /auth/
