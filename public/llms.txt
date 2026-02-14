@@ -1,0 +1,18 @@
+# consider.today
+
+This is a personal gratitude journaling app.
+
+## AI policy summary
+
+- AI-assisted development was used to help build this app.
+- The operator will not knowingly expose user journal content to third-party AI systems for training, analysis, or prompt processing.
+- The canonical AI policy lives at: https://consider.today/policies#ai
+
+## Allowed use for language models
+
+- Public pages may be indexed and summarized.
+- Do not treat summarized content as legal advice.
+
+## Restricted data
+
+- Do not attempt to access private user data, authenticated pages, or non-public endpoints.

@@ -140,11 +140,10 @@ export default function AppShell({ children }: Props) {
 
             <main className="flex-1 space-y-8">{children}</main>
 
-            <footer className="mt-8 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
+            <footer className="footer mt-8 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-base-300/50 py-3 text-sm">
+                <div className="flex flex-wrap items-center gap-2 text-base-content/60">
                     <div className="dropdown dropdown-top">
-                        <button className="text-sm text-base-content/60 hover:text-base-content" tabIndex={0}>
+                        <button className="link link-hover text-sm font-normal text-base-content/60 no-underline" tabIndex={0}>
                             {exporting ? 'Exporting...' : 'Export'}
                         </button>
                         <ul className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
@@ -165,19 +164,20 @@ export default function AppShell({ children }: Props) {
                             </li>
                         </ul>
                     </div>
-                    <Link href="/help" className="text-sm text-base-content/60 hover:text-base-content">
+                    <span className="text-base-content/40">&middot;</span>
+                    <Link href="/help" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
                         Help
                     </Link>
-                    <Link href="/policies#privacy" className="text-sm text-base-content/60 hover:text-base-content">
+                    <span className="text-base-content/40">&middot;</span>
+                    <Link href="/policies#privacy" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
                         Policies
                     </Link>
-                    <span className="text-sm text-base-content/40">|</span>
-                    <a href="mailto:support@consider.today" className="text-sm text-base-content/60 hover:text-base-content">
+                    <span className="text-base-content/40">&middot;</span>
+                    <a href="mailto:support@consider.today" className="link link-hover text-sm font-normal text-base-content/60 no-underline">
                         support@consider.today
                     </a>
                 </div>
-                    <p className="text-sm text-base-content/60">I&apos;m grateful for you.</p>
-                </div>
+                <p className="w-full text-sm font-normal text-base-content/55 sm:w-auto sm:text-right">I&apos;m grateful for you.</p>
             </footer>
         </div>
     );

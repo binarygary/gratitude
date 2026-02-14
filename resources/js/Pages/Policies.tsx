@@ -36,6 +36,9 @@ export default function Policies() {
                     <p className="text-sm text-base-content/70">
                         This page includes Privacy Policy and Terms of Service for <BrandName />.
                     </p>
+                    <p className="text-sm text-base-content/70">
+                        The tl;dr is this is an app I built for myself and thought others might find it useful too. I don't have any interest in selling your data or showing you ads, and I built the app to work well without an account so you can use it without sharing anything if you want. <strong>Thank you for checking it out and I hope you find it useful!</strong>
+                    </p>
                     <div className="flex flex-wrap gap-2">
                         <Link href="/policies#privacy" className="link link-hover text-sm">
                             Privacy
@@ -60,6 +63,9 @@ export default function Policies() {
                         </Link>
                         <Link href="/policies#children" className="link link-hover text-sm">
                             Children
+                        </Link>
+                        <Link href="/policies#ai" className="link link-hover text-sm">
+                            AI
                         </Link>
                     </div>
                 </div>
@@ -143,6 +149,18 @@ export default function Policies() {
             <Section id="children" title="Children's Privacy">
                 <p className="text-sm text-base-content/70">
                     <BrandName /> is not directed to children under 13. If you believe a child has provided personal data, contact support so we can review and remove it.
+                </p>
+            </Section>
+
+            <Section id="ai" title="AI Use and Model Access Policy">
+                <p className="text-sm text-base-content/70">
+                    I used AI tools to help build parts of <BrandName />.
+                </p>
+                <p className="text-sm text-base-content/70">
+                    I will not knowingly send user journal content to third-party AI systems for training, analysis, or prompt processing.
+                </p>
+                <p className="text-sm text-base-content/70">
+                    If this policy changes in the future, this page will be updated with a new effective date.
                 </p>
             </Section>
         </AppShell>
