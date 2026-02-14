@@ -93,14 +93,6 @@ export default function Settings() {
             </div>
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
-                <div className="card-body gap-3 p-6">
-                    <h2 className="text-lg font-medium text-base-content">Privacy</h2>
-                    <p className="text-sm text-base-content/70">Entries are private.</p>
-                    <p className="text-sm text-base-content/60">Export anytime.</p>
-                </div>
-            </div>
-
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h2 className="text-lg font-medium text-base-content">Reminders</h2>
                     <p className="text-sm text-base-content/60">Coming later. You can still add a daily reminder to your calendar today.</p>
