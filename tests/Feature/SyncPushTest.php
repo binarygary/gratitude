@@ -27,8 +27,11 @@ class SyncPushTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['entries.0.entry_date']);
+        $response->assertStatus(200);
+        $response->assertJsonPath('ok', true);
+        $response->assertJsonPath('results.0.entry_date', '2025-12-31');
+        $response->assertJsonPath('results.0.status', 'rejected');
+        $response->assertJsonPath('results.0.errors.entry_date.0', 'The entry date field must be a date after or equal to 2026-01-01.');
     }
 
     public function test_sync_push_accepts_entries_on_or_after_2026_01_01(): void
@@ -52,6 +55,7 @@ class SyncPushTest extends TestCase
         $response->assertJson([
             'ok' => true,
         ]);
+        $response->assertJsonPath('results.0.status', 'upserted');
     }
 
     public function test_sync_push_accepts_entries_after_2026_01_01(): void
@@ -75,5 +79,36 @@ class SyncPushTest extends TestCase
         $response->assertJson([
             'ok' => true,
         ]);
+        $response->assertJsonPath('results.0.status', 'upserted');
+    }
+
+    public function test_sync_push_accepts_valid_entries_and_rejects_older_entries_in_same_batch(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/sync/push', [
+            'device_id' => 'test-device-mixed',
+            'entries' => [
+                [
+                    'entry_date' => '2025-12-31',
+                    'person' => 'Too Old',
+                    'grace' => 'Old Grace',
+                    'gratitude' => 'Old Gratitude',
+                    'updated_at' => time() * 1000,
+                ],
+                [
+                    'entry_date' => '2026-01-01',
+                    'person' => 'Valid',
+                    'grace' => 'Valid Grace',
+                    'gratitude' => 'Valid Gratitude',
+                    'updated_at' => time() * 1000,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('ok', true);
+        $response->assertJsonPath('results.0.status', 'rejected');
+        $response->assertJsonPath('results.1.status', 'upserted');
     }
 }
