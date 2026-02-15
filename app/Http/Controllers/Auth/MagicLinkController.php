@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 
 class MagicLinkController extends Controller
 {
+    private const MAGIC_LINK_REMEMBER_MINUTES = 64_800; // 45 days
+
     public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -69,9 +71,10 @@ class MagicLinkController extends Controller
 
         $record->forceFill(['used_at' => now()])->save();
 
-        Auth::login($record->user);
+        Auth::guard('web')->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
+        Auth::login($record->user, remember: true);
         $request->session()->regenerate();
-        event(new Login('web', $record->user, false));
+        event(new Login('web', $record->user, true));
 
         return to_route('today.show')->with('status', 'Signed in successfully.');
     }
