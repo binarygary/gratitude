@@ -11,7 +11,7 @@ class EntryController extends Controller
     public function upsert(Request $request, UpsertEntry $upsertEntry): JsonResponse
     {
         $validated = $request->validate([
-            'entry_date' => ['required', 'date_format:Y-m-d'],
+            'entry_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:2026-01-01'],
             'person' => ['nullable', 'string'],
             'grace' => ['nullable', 'string'],
             'gratitude' => ['nullable', 'string'],
