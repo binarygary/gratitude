@@ -14,7 +14,7 @@ class SyncController extends Controller
         $validated = $request->validate([
             'device_id' => ['required', 'string', 'max:64'],
             'entries' => ['required', 'array'],
-            'entries.*.entry_date' => ['required', 'date_format:Y-m-d'],
+            'entries.*.entry_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:2026-01-01'],
             'entries.*.person' => ['nullable', 'string'],
             'entries.*.grace' => ['nullable', 'string'],
             'entries.*.gratitude' => ['nullable', 'string'],
