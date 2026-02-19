@@ -141,7 +141,7 @@ export default function Today() {
 
             if (!ignore) {
                 setIsKnownUser(knownUser);
-                if (knownUser) {
+                if (knownUser && localStorage.getItem(INTRO_COLLAPSED_STORAGE_KEY) === null) {
                     setIsIntroExpanded(false);
                 }
             }
