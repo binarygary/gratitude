@@ -5,7 +5,7 @@ import AppShell from '../Components/AppShell';
 import FlashbackCard from '../Components/FlashbackCard';
 import PromptCard from '../Components/PromptCard';
 import SeoHead from '../Components/SeoHead';
-import { getEntryByDate, pushUnsyncedEntries, seedLocalEntries, upsertLocalEntry } from '../lib/db';
+import { countLocalEntries, getEntryByDate, pushUnsyncedEntries, seedLocalEntries, upsertLocalEntry } from '../lib/db';
 
 type Entry = {
     entry_date: string;
@@ -39,6 +39,8 @@ type LocalSeedRequest = {
     endDate?: string;
     clearExisting: boolean;
 };
+
+const INTRO_COLLAPSED_STORAGE_KEY = 'today_intro_collapsed';
 
 function ymdMinusDays(ymd: string, days: number): string {
     const date = new Date(`${ymd}T12:00:00Z`);
@@ -106,6 +108,8 @@ export default function Today() {
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
     const [savedCount, setSavedCount] = useState<number>(() => Number(localStorage.getItem('save_count') ?? '0'));
+    const [isKnownUser, setIsKnownUser] = useState(false);
+    const [isIntroExpanded, setIsIntroExpanded] = useState(() => localStorage.getItem(INTRO_COLLAPSED_STORAGE_KEY) !== '1');
     const [seedMessage, setSeedMessage] = useState<string | null>(null);
     const [localFlashbacks, setLocalFlashbacks] = useState<{ weekAgo: Flashback; yearAgo: Flashback }>({
         weekAgo: null,
@@ -118,10 +122,30 @@ export default function Today() {
         [person, grace, gratitude],
     );
 
+    const collapseIntro = () => {
+        localStorage.setItem(INTRO_COLLAPSED_STORAGE_KEY, '1');
+        setIsIntroExpanded(false);
+    };
+
+    const expandIntro = () => {
+        localStorage.removeItem(INTRO_COLLAPSED_STORAGE_KEY);
+        setIsIntroExpanded(true);
+    };
+
     useEffect(() => {
         let ignore = false;
 
         const load = async () => {
+            const localEntryCount = await countLocalEntries();
+            const knownUser = localEntryCount >= 3;
+
+            if (!ignore) {
+                setIsKnownUser(knownUser);
+                if (knownUser) {
+                    setIsIntroExpanded(false);
+                }
+            }
+
             if (!props.auth.user) {
                 const queryKey = window.location.search;
                 const seedRequest = getLocalSeedRequest();
@@ -263,6 +287,13 @@ export default function Today() {
                 setSavedCount(nextCount);
             }
 
+            if (!isKnownUser) {
+                const localEntryCount = await countLocalEntries();
+                if (localEntryCount >= 3) {
+                    setIsKnownUser(true);
+                }
+            }
+
             setLastSavedAt(updatedAt);
         } finally {
             setIsSaving(false);
@@ -287,13 +318,41 @@ export default function Today() {
 
             <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
                 <div className="card-body gap-4 p-6">
-                    <h1 className="text-2xl font-semibold text-base-content">Today</h1>
-                    <p className="text-sm text-base-content/70">{formattedDate}</p>
-                    <p className="text-sm text-base-content/70">This is your 3-prompt gratitude journal.</p>
-                    <p className="text-sm text-base-content/70">Private by default. Your entries stay on your local device until you decide otherwise.</p>
-                    <p className="text-sm text-base-content/70">
-                        Entries can be exported anytime. Sign in to sync so your reflections are available across devices.
-                    </p>
+                    {!isIntroExpanded ? (
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <h1 className="text-2xl font-semibold text-base-content">Welcome Back</h1>
+                                <p className="text-sm text-base-content/70">{formattedDate}</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-ghost btn-sm"
+                                onClick={expandIntro}
+                            >
+                                Show intro
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between gap-3">
+                                <h1 className="text-2xl font-semibold text-base-content">Today</h1>
+                                <button
+                                    type="button"
+                                    aria-label="Close intro"
+                                    className="btn btn-ghost btn-sm btn-circle"
+                                    onClick={collapseIntro}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <p className="text-sm text-base-content/70">{formattedDate}</p>
+                            <p className="text-sm text-base-content/70">This is your 3-prompt gratitude journal.</p>
+                            <p className="text-sm text-base-content/70">Private by default. Your entries stay on your local device until you decide otherwise.</p>
+                            <p className="text-sm text-base-content/70">
+                                Entries can be exported anytime. Sign in to sync so your reflections are available across devices.
+                            </p>
+                        </>
+                    )}
                     {seedMessage && <p className="text-sm text-success">{seedMessage}</p>}
                 </div>
             </div>

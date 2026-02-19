@@ -73,6 +73,10 @@ export async function listAllEntries(): Promise<LocalEntry[]> {
     return db.entries.orderBy('entry_date').reverse().toArray();
 }
 
+export async function countLocalEntries(): Promise<number> {
+    return db.entries.count();
+}
+
 export async function listUnsyncedEntries(): Promise<LocalEntry[]> {
     return db.entries.filter((entry) => entry.synced_at === null).toArray();
 }
