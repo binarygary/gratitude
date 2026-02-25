@@ -62,23 +62,23 @@ export default function AppShell({ children }: Props) {
 
     return (
         <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
-            <div className="navbar mb-8 rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="navbar mb-8 rounded-2xl border border-base-300/50 bg-white px-2 sm:px-3 shadow-sm">
                 <div className="flex-1">
-                    <Link href="/today" className="btn btn-ghost text-lg font-medium text-base-content">
+                    <Link href="/today" className="btn btn-ghost h-10 min-h-10 px-2 text-base font-medium text-base-content sm:h-12 sm:min-h-12 sm:px-3 sm:text-lg">
                         <BrandName />
                     </Link>
                 </div>
-                <div className="flex gap-2">
-                    <Link href="/today" className="btn btn-sm btn-ghost">
+                <div className="flex items-center gap-1 sm:gap-2">
+                    <Link href="/today" className="btn btn-xs btn-ghost sm:btn-sm">
                         Today
                     </Link>
-                    <Link href="/history" className="btn btn-sm btn-ghost">
+                    <Link href="/history" className="btn btn-xs btn-ghost sm:btn-sm">
                         History
                     </Link>
                     {authUser ? (
                         <div className="dropdown dropdown-end">
                             <button
-                                className="btn btn-sm btn-ghost rounded-full"
+                                className="btn btn-xs btn-ghost rounded-full sm:btn-sm"
                                 type="button"
                                 aria-label="Account menu"
                                 aria-haspopup="menu"
