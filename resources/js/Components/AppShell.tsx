@@ -19,16 +19,88 @@ type SharedProps = {
     };
 };
 
+type ThemePreference = 'retro' | 'dim' | 'system';
+type ResolvedTheme = 'retro' | 'dim';
+const themeLabel: Record<ThemePreference, string> = {
+    retro: 'Light',
+    system: 'System',
+    dim: 'Dark',
+};
+
+function ThemeIcon({ preference }: { preference: ThemePreference }) {
+    if (preference === 'retro') {
+        return (
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2.5v2.2M12 19.3v2.2M4.7 4.7l1.6 1.6M17.7 17.7l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.7 19.3l1.6-1.6M17.7 6.3l1.6-1.6" />
+            </svg>
+        );
+    }
+
+    if (preference === 'dim') {
+        return (
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M14.5 3.2a8.8 8.8 0 1 0 6.3 14.7A7.7 7.7 0 1 1 14.5 3.2Z" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <rect x="4" y="5" width="16" height="11" rx="2" />
+            <path d="M9 19h6M12 16v3" />
+        </svg>
+    );
+}
+
 export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
+    const [themePreference, setThemePreference] = useState<ThemePreference>('system');
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const loginDropdownRef = useRef<HTMLDivElement | null>(null);
 
     const loginForm = useForm({ email: '' });
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        const nextPreference = savedTheme === 'retro' || savedTheme === 'dim' || savedTheme === 'system'
+            ? savedTheme
+            : 'system';
+
+        setThemePreference(nextPreference);
+    }, []);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const resolveTheme = (): ResolvedTheme =>
+            themePreference === 'system' ? (media.matches ? 'dim' : 'retro') : themePreference;
+
+        const applyTheme = () => {
+            const nextTheme = resolveTheme();
+            root.setAttribute('data-theme', nextTheme);
+        };
+
+        applyTheme();
+
+        if (themePreference !== 'system') {
+            return;
+        }
+
+        const handleSystemThemeChange = () => {
+            applyTheme();
+        };
+
+        media.addEventListener('change', handleSystemThemeChange);
+
+        return () => {
+            media.removeEventListener('change', handleSystemThemeChange);
+        };
+    }, [themePreference]);
 
     useEffect(() => {
         const handleOutsidePress = (event: MouseEvent | TouchEvent) => {
@@ -60,19 +132,63 @@ export default function AppShell({ children }: Props) {
         }
     };
 
+    const setThemeMode = (preference: ThemePreference) => {
+        localStorage.setItem('theme', preference);
+        setThemePreference(preference);
+    };
+
     return (
         <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6">
-            <div className="navbar mb-8 rounded-2xl border border-base-300/50 bg-white px-2 sm:px-3 shadow-sm">
+            <div className="app-navbar-surface navbar mb-8 rounded-2xl border border-base-300/50 bg-base-100 px-2 sm:px-3 shadow-sm">
                 <div className="flex-1">
                     <Link href="/today" className="btn btn-ghost h-10 min-h-10 px-2 text-base font-medium text-base-content sm:h-12 sm:min-h-12 sm:px-3 sm:text-lg">
                         <BrandName />
                     </Link>
                 </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                    <Link href="/today" className="btn btn-xs btn-ghost sm:btn-sm">
+                <div className="flex items-center gap-0.5 sm:gap-2">
+                    <div className="dropdown dropdown-end">
+                        <button
+                            className="btn btn-xs btn-ghost px-1.5 sm:btn-sm sm:gap-2 sm:px-2"
+                            type="button"
+                            tabIndex={0}
+                            aria-haspopup="menu"
+                            aria-controls="theme-menu"
+                            aria-label={`Theme: ${themeLabel[themePreference]}`}
+                            title={`Theme: ${themeLabel[themePreference]}`}
+                        >
+                            <ThemeIcon preference={themePreference} />
+                            <span className="hidden sm:inline">Theme: {themeLabel[themePreference]}</span>
+                            <svg viewBox="0 0 20 20" className="hidden h-3 w-3 opacity-70 sm:block" fill="currentColor" aria-hidden="true">
+                                <path d="M5.2 7.5 10 12.3l4.8-4.8" />
+                            </svg>
+                        </button>
+                        <ul
+                            id="theme-menu"
+                            tabIndex={0}
+                            className="menu dropdown-content z-10 mt-2 w-44 rounded-box border border-base-300/50 bg-base-100 app-card-surface p-2 shadow-sm"
+                        >
+                            <li>
+                                <button type="button" onClick={() => setThemeMode('retro')}>
+                                    {themePreference === 'retro' ? '✓ ' : ''}Light
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" onClick={() => setThemeMode('system')}>
+                                    {themePreference === 'system' ? '✓ ' : ''}System
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" onClick={() => setThemeMode('dim')}>
+                                    {themePreference === 'dim' ? '✓ ' : ''}Dark
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <span className="hidden h-5 w-px bg-base-content/20 sm:block" aria-hidden="true" />
+                    <Link href="/today" className="btn btn-xs btn-ghost px-2 sm:btn-sm">
                         Today
                     </Link>
-                    <Link href="/history" className="btn btn-xs btn-ghost sm:btn-sm">
+                    <Link href="/history" className="btn btn-xs btn-ghost px-2 sm:btn-sm">
                         History
                     </Link>
                     {authUser ? (
@@ -92,7 +208,7 @@ export default function AppShell({ children }: Props) {
                             </button>
                             <ul
                                 id="account-menu"
-                                className="menu dropdown-content z-10 mt-2 w-52 rounded-box border border-base-300/50 bg-white p-2 shadow-sm"
+                                className="menu dropdown-content z-10 mt-2 w-52 rounded-box border border-base-300/50 bg-base-100 app-card-surface p-2 shadow-sm"
                             >
                                 <li>
                                     <Link href="/settings">Account settings</Link>
@@ -107,18 +223,30 @@ export default function AppShell({ children }: Props) {
                     ) : (
                         <div className="relative" ref={loginDropdownRef}>
                             <button
-                                className="btn btn-sm btn-primary"
+                                className="btn btn-sm btn-primary px-2 sm:px-4"
                                 type="button"
                                 aria-haspopup="dialog"
                                 aria-expanded={isLoginOpen}
                                 aria-controls="sign-in-menu"
+                                aria-label="Sign in"
                                 onClick={() => setIsLoginOpen((open) => !open)}
                             >
-                                Sign in
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    className="h-4 w-4 sm:hidden"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z" />
+                                    <path d="m5 8 7 5 7-5" />
+                                </svg>
+                                <span className="hidden sm:inline">Sign in</span>
                             </button>
                             <form
                                 id="sign-in-menu"
-                                className={`absolute right-0 z-10 mt-2 w-72 rounded-2xl border border-base-300/50 bg-white p-4 shadow-sm ${
+                                className={`absolute right-0 z-10 mt-2 w-72 rounded-2xl border border-base-300/50 bg-base-100 app-card-surface p-4 shadow-sm ${
                                     isLoginOpen ? 'block' : 'hidden'
                                 }`}
                                 onSubmit={(event) => {
@@ -177,7 +305,7 @@ export default function AppShell({ children }: Props) {
                         >
                             {exporting ? 'Exporting...' : 'Export'}
                         </button>
-                        <ul id="export-menu" className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-white p-2 shadow-sm">
+                        <ul id="export-menu" className="menu dropdown-content z-10 mt-2 w-40 rounded-box border border-base-300/50 bg-base-100 app-card-surface p-2 shadow-sm">
                             <li>
                                 <button type="button" onClick={() => handleExport('json')} disabled={Boolean(exporting)}>
                                     JSON

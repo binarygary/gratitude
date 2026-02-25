@@ -21,10 +21,10 @@ type PageProps = {
 
 function ReadOnlySection({ title, value }: { title: ReactNode; value: string | null }) {
     return (
-        <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+        <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
             <div className="card-body gap-4 p-6">
                 <h2 className="text-base font-medium text-base-content">{title}</h2>
-                <div className="min-h-[120px] whitespace-pre-wrap rounded-xl border border-base-300/70 bg-white p-4 text-base leading-relaxed text-base-content">
+                <div className="min-h-[120px] whitespace-pre-wrap rounded-xl border border-base-300/70 bg-base-100 app-input-surface p-4 text-base leading-relaxed text-base-content">
                     {value?.trim() || '-'}
                 </div>
             </div>
@@ -95,7 +95,7 @@ export default function HistoryEntry() {
                 noIndex
             />
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <div>
                         <h1 className="text-2xl font-semibold text-base-content">{formattedDate}</h1>

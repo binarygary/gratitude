@@ -16,7 +16,7 @@ function Section({
     children: ReactNode;
 }) {
     return (
-        <section id={id} className="card scroll-mt-24 rounded-2xl border border-base-300/50 bg-white shadow-sm">
+        <section id={id} className="card scroll-mt-24 rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
             <div className="card-body gap-3 p-6">
                 <h2 className="text-lg font-medium text-base-content">{title}</h2>
                 {children}
@@ -34,7 +34,7 @@ export default function Policies() {
                 canonicalPath="/policies"
             />
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h1 className="text-3xl font-semibold text-base-content">Policies</h1>
                     <p className="text-sm text-base-content/70">Effective date: {effectiveDate}</p>

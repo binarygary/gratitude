@@ -11,7 +11,7 @@ export default function Help() {
                 canonicalPath="/help"
             />
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h1 className="text-3xl font-semibold text-base-content">Help</h1>
                     <p className="text-sm text-base-content/70">
@@ -20,7 +20,7 @@ export default function Help() {
                 </div>
             </div>
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-3 p-6">
                     <h2 className="text-lg font-medium text-base-content">How saving works</h2>
                     <p className="text-sm text-base-content/70">
@@ -32,7 +32,7 @@ export default function Help() {
                 </div>
             </div>
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-3 p-6">
                     <h2 className="text-lg font-medium text-base-content">What happens when you create an account</h2>
                     <p className="text-sm text-base-content/70">
@@ -41,7 +41,7 @@ export default function Help() {
                 </div>
             </div>
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-3 p-6">
                     <h2 className="text-lg font-medium text-base-content">Personal data and email</h2>
                     <p className="text-sm text-base-content/70">

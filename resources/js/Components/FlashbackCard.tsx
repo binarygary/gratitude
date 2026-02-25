@@ -14,7 +14,7 @@ type Props = {
 
 export default function FlashbackCard({ title, flashback }: Props) {
     return (
-        <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+        <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
             <div className="card-body gap-3 p-5">
                 <h3 className="text-base font-medium text-base-content">{title}</h3>
                 {flashback ? (

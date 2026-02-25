@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @plugin 'daisyui' {
-    themes: retro --default;
+    themes: retro --default, dim --prefersdark;
     exclude: properties, radialprogress;
 }
 
@@ -13,6 +13,30 @@
     --color-accent: oklch(75% 0.06 70);
     --color-accent-content: oklch(30% 0.03 70);
     --color-base-content: oklch(28% 0.015 260);
+}
+
+[data-theme='retro'] .app-navbar-surface {
+    background-color: white;
+}
+
+[data-theme='retro'] .app-card-surface,
+[data-theme='retro'] .app-input-surface {
+    background-color: white;
+}
+
+[data-theme='dim'] body {
+    background-color: #353f52;
+}
+
+[data-theme='dim'] .app-card-surface {
+    background-color: #3c485c;
+    border-color: #4a5870;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='dim'] .app-input-surface {
+    background-color: #374255;
+    border-color: #56657f;
 }
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
