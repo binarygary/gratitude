@@ -81,13 +81,13 @@ export default function Policies() {
                     Journal entries may contain personal reflections that you type into the app.
                 </p>
                 <p className="text-sm text-base-content/70">
-                    If you sign in, we collect your email address to create your account and send one-time magic sign-in links.
+                    If you sign in, I collect your email address to create your account and send one-time magic sign-in links.
                 </p>
                 <p className="text-sm text-base-content/70">
                     <BrandName /> is local-first. Entries are stored in your browser on your device and synced to our server only after sign in.
                 </p>
                 <p className="text-sm text-base-content/70">
-                    We use data to provide app features such as save, sync, sign-in, history, and settings. We do not sell personal data.
+                    I use data to provide app features such as save, sync, sign-in, history, and settings. I do not sell personal data.
                 </p>
             </Section>
 
@@ -99,16 +99,16 @@ export default function Policies() {
                     You are responsible for content you enter into your journal and for keeping access to your email account secure.
                 </p>
                 <p className="text-sm text-base-content/70">
-                    We may modify, suspend, or discontinue features at any time. Continued use after updates means you accept the revised terms.
+                    I may modify, suspend, or discontinue features at any time. Continued use after updates means you accept the revised terms.
                 </p>
             </Section>
 
             <Section id="cookies" title="Cookie and Tracking Notice">
                 <p className="text-sm text-base-content/70">
-                    We use essential session/csrf cookies required for authentication and secure operation of the app.
+                    I use essential session/csrf cookies required for authentication and secure operation of the app.
                 </p>
                 <p className="text-sm text-base-content/70">
-                    We do not use advertising cookies within core app functionality.
+                    I do not use advertising cookies within core app functionality.
                 </p>
             </Section>
 
@@ -147,22 +147,22 @@ export default function Policies() {
 
             <Section id="email" title="Email Communications Policy">
                 <p className="text-sm text-base-content/70">
-                    We send transactional emails needed for sign-in (magic links). We do not use these emails for advertising.
+                    I send transactional emails needed for sign-in (magic links). I do not use these emails for advertising.
                 </p>
             </Section>
 
             <Section id="children" title="Children's Privacy">
                 <p className="text-sm text-base-content/70">
-                    <BrandName /> is not directed to children under 13. If you believe a child has provided personal data, contact support so we can review and remove it.
+                    <BrandName /> is not directed to children under 13. If you believe a child has provided personal data, contact support so I can review and remove it.
                 </p>
             </Section>
 
             <Section id="ai" title="AI Use and Model Access Policy">
                 <p className="text-sm text-base-content/70">
-                    I used AI tools to help build parts of <BrandName />.
+                    I used AI tools to help build parts of <BrandName />. Specifically, I used github copilot for code suggestions/auto-completion and code review, and I used chatGPT for reviewing and improving my approach to UX and privacy integrity (ironically).
                 </p>
                 <p className="text-sm text-base-content/70">
-                    I will not knowingly send user journal content to third-party AI systems for training, analysis, or prompt processing.
+                    I will not share user journal content to third-party AI systems for training, analysis, prompt processing, or any other reason. Additionally, your entries are never public so the cannot be read or index by Large Language Models (LLMs).
                 </p>
                 <p className="text-sm text-base-content/70">
                     If this policy changes in the future, this page will be updated with a new effective date.
