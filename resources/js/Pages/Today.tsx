@@ -316,7 +316,7 @@ export default function Today() {
                 noIndex
             />
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     {!isIntroExpanded ? (
                         <div className="flex items-center justify-between gap-3">

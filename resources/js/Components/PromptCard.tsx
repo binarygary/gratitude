@@ -13,7 +13,7 @@ export default function PromptCard({ title, helperText, value, onChange, placeho
     const helperTextId = useId();
 
     return (
-        <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+        <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
             <div className="card-body gap-4 p-6">
                 <h2 id={titleId} className="text-base font-medium text-base-content">
                     {title}
@@ -24,7 +24,7 @@ export default function PromptCard({ title, helperText, value, onChange, placeho
                     </p>
                 )}
                 <textarea
-                    className="textarea textarea-bordered min-h-[120px] w-full rounded-xl bg-white text-base leading-relaxed text-base-content shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="textarea textarea-bordered min-h-[120px] w-full rounded-xl bg-base-100 app-input-surface text-base leading-relaxed text-base-content shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/20"
                     value={value}
                     placeholder={placeholder}
                     aria-labelledby={titleId}

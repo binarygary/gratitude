@@ -89,7 +89,7 @@ export default function History() {
                 noIndex
             />
 
-            <div className="card rounded-2xl border border-base-300/50 bg-white shadow-sm">
+            <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-5 p-6">
                     <h1 className="text-3xl font-semibold text-base-content">History</h1>
                     <div className="grid gap-3 sm:grid-cols-[1fr_auto]">

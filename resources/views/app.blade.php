@@ -67,6 +67,21 @@
         <meta name="twitter:image" content="{{ $socialImage }}">
         <meta name="twitter:url" content="{{ $canonical }}">
 
+        <script>
+            (() => {
+                const savedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const preference = savedTheme === 'retro' || savedTheme === 'dim' || savedTheme === 'system'
+                    ? savedTheme
+                    : 'system';
+                const theme = preference === 'system'
+                    ? (systemPrefersDark ? 'dim' : 'retro')
+                    : preference;
+
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
+
         <title inertia>{{ $metaTitle }}</title>
         @vite(['resources/js/app.tsx'])
         @inertiaHead
