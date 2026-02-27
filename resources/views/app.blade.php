@@ -19,7 +19,7 @@
                 request()->is('today') => [
                     'title' => 'Today',
                     'description' => 'Write your daily gratitude reflection in three short prompts. Entries are private by default and stored locally first.',
-                    'robots' => 'noindex,nofollow',
+                    'robots' => 'index,follow',
                 ],
                 request()->is('history'), request()->is('history/*') => [
                     'title' => 'History',
