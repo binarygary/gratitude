@@ -22,7 +22,7 @@ Core behavior:
 
 - PHP 8.2+
 - Composer
-- Node.js + npm
+- Node.js 22.12+ and npm 10+
 - SQLite
 
 ### 2. Install and bootstrap
