@@ -9,6 +9,16 @@ Core behavior:
 - Sign in with passwordless magic links.
 - Work locally-first in the browser (Dexie/IndexedDB) and sync to server when authenticated.
 
+## Project Planning
+
+- Planning index: [`_planning/README.md`](./_planning/README.md)
+- Status: [`_planning/STATUS.md`](./_planning/STATUS.md)
+- Current focus: [`_planning/NOW.md`](./_planning/NOW.md)
+- Backlog: [`_planning/BACKLOG.md`](./_planning/BACKLOG.md)
+- Roadmap: [`_planning/ROADMAP.md`](./_planning/ROADMAP.md)
+- Runbooks: [`_planning/RUNBOOKS.md`](./_planning/RUNBOOKS.md)
+- Recurring tasks: [`_planning/tasks/recurring.md`](./_planning/tasks/recurring.md)
+
 ## Tech Stack
 
 - Backend: Laravel 12, PHP 8.2+
