@@ -1,16 +1,38 @@
-# PLAN.md
+# Roadmap
 
-## Beta Share Plan (Hosted, Open Signup, Quick Beta)
+## Next 30 days
 
-### Goal
+- Establish hosted beta deployment baseline and document exact deploy/run commands.
+- Configure production environment variables and queue worker process.
+- Move magic-link email from log mailer to a real provider and validate domain auth.
+
+## Next 60 days
+
+- Add abuse protections and harden session/token handling.
+- Define persistent DB strategy with backup and restore procedures.
+- Add critical auth/sync test coverage and lock in CI checks.
+
+## Next 90 days
+
+- Improve friend-facing reliability messaging and failure handling UX.
+- Complete production readiness pass for observability and operational docs.
+- Review beta feedback and plan post-beta priorities.
+
+## Imported
+
+Imported from `PLAN.md` during consolidation on 2026-03-01.
+
+### Beta Share Plan (Hosted, Open Signup, Quick Beta)
+
+#### Goal
 Ship a hosted Gratitude Journal link friends can use without handholding, with acceptable beta-level reliability and security.
 
-### Scope (locked)
+#### Scope (locked)
 - Distribution: Hosted web app
 - Access: Anyone with email can sign in
 - Quality bar: Quick beta
 
-### Must-Do Work (in order)
+#### Must-Do Work (in order)
 
 1. Deployment baseline
 - Choose hosting target and document exact deploy/run commands.
@@ -57,7 +79,7 @@ Ship a hosted Gratitude Journal link friends can use without handholding, with a
 - Add basic error states for save/sync/email failures.
 - Add short privacy note.
 
-### Acceptance Criteria
+#### Acceptance Criteria
 
 - Friend can request magic link and receive email in inbox.
 - Invalid/expired/used links are rejected safely.
@@ -66,7 +88,7 @@ Ship a hosted Gratitude Journal link friends can use without handholding, with a
 - CI passes on clean environment.
 - Fresh deploy works from docs without manual fixes.
 
-### Known Defaults / Assumptions
+#### Known Defaults / Assumptions
 
 - Open email signup remains enabled for beta.
 - Prioritize shipping speed over full production-grade observability.
