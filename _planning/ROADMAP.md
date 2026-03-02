@@ -1,22 +1,28 @@
 # Roadmap
 
+Beta-ready target date: **April 1, 2026**
+
 ## Next 30 days
 
-- Establish hosted beta deployment baseline and document exact deploy/run commands.
-- Configure production environment variables and queue worker process.
-- Move magic-link email from log mailer to a real provider and validate domain auth.
+- Ship a stable, friend-shareable beta and make people aware through product-led sharing (not broad marketing).
+- Implement timezone support end-to-end (storage, display, scheduling behavior).
+- Add notifications foundation (event model, delivery channel choice, initial user controls).
+- Add observability baseline (error tracking, performance metrics, request latency visibility).
+- Deliver minimal admin panel for beta operations (user lookup, health/status checks, basic support actions).
+- Keep beta access open via email sign-in and set expectations on beta reliability.
 
 ## Next 60 days
 
-- Add abuse protections and harden session/token handling.
-- Define persistent DB strategy with backup and restore procedures.
-- Add critical auth/sync test coverage and lock in CI checks.
+- Harden auth and abuse controls (Turnstile, token/session safeguards, rate limit verification).
+- Strengthen production data durability (backup + restore runbook, restore drill).
+- Expand test coverage and CI gates for auth, sync, notifications, and timezone-sensitive behavior.
+- Improve reliability UX and fallback states for save/sync/email/notification failures.
 
 ## Next 90 days
 
-- Improve friend-facing reliability messaging and failure handling UX.
-- Complete production readiness pass for observability and operational docs.
-- Review beta feedback and plan post-beta priorities.
+- Use beta feedback to prioritize retention and usability improvements.
+- Expand admin/ops tooling based on real support needs.
+- Decide post-beta scope (growth loops, deeper analytics, broader launch prep).
 
 ## Imported
 
