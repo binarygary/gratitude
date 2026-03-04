@@ -307,6 +307,30 @@ export default function Today() {
         day: 'numeric',
     });
 
+    const baseUrl = window.location.origin.replace(/\/+$/, '');
+    const todayUrl = `${baseUrl}/today`;
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        '@id': `${todayUrl}#app`,
+        name: 'consider.today',
+        url: todayUrl,
+        description: 'A daily gratitude reflection app with three prompts and optional cross-device sync.',
+        applicationCategory: 'LifestyleApplication',
+        operatingSystem: 'Any',
+        offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+        },
+        featureList: [
+            'Daily three-prompt gratitude journal',
+            'Private by default with local-first storage',
+            'Optional sync across devices after sign in',
+            'History and reflection flashbacks',
+        ],
+    };
+
     return (
         <AppShell>
             <SeoHead
@@ -314,6 +338,7 @@ export default function Today() {
                 description="Write your daily gratitude reflection in three short prompts. Entries are private by default and stored locally first."
                 canonicalPath="/today"
                 noIndex
+                structuredData={structuredData}
             />
 
             <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">

@@ -49,6 +49,8 @@
         <meta name="description" content="{{ $meta['description'] }}">
         <meta name="robots" content="{{ $meta['robots'] }}">
         <link rel="canonical" href="{{ $canonical }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="{{ $appName }}">

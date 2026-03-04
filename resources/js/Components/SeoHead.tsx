@@ -5,6 +5,7 @@ type Props = {
     description: string;
     canonicalPath?: string;
     noIndex?: boolean;
+    structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
 };
 
 type SharedProps = {
@@ -13,7 +14,7 @@ type SharedProps = {
     };
 };
 
-export default function SeoHead({ title, description, canonicalPath, noIndex = false }: Props) {
+export default function SeoHead({ title, description, canonicalPath, noIndex = false, structuredData }: Props) {
     const { props } = usePage<SharedProps>();
 
     const appName = 'consider.today';
@@ -23,6 +24,9 @@ export default function SeoHead({ title, description, canonicalPath, noIndex = f
     const socialImage = `${baseUrl}/social-preview.png`;
     const fullTitle = `${title} | ${appName}`;
     const robots = noIndex ? 'noindex,nofollow' : 'index,follow';
+    const structuredDataJson = structuredData
+        ? JSON.stringify(structuredData).replace(/</g, '\\u003c')
+        : null;
 
     return (
         <Head title={fullTitle}>
@@ -46,6 +50,14 @@ export default function SeoHead({ title, description, canonicalPath, noIndex = f
             <meta head-key="twitter:description" name="twitter:description" content={description} />
             <meta head-key="twitter:image" name="twitter:image" content={socialImage} />
             <meta head-key="twitter:url" name="twitter:url" content={canonical} />
+
+            {structuredDataJson && (
+                <script
+                    head-key="schema-org"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: structuredDataJson }}
+                />
+            )}
         </Head>
     );
 }
