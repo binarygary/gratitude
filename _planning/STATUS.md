@@ -8,11 +8,17 @@
 
 ## Health
 
-- Tests: Baseline test suite available via `composer test`.
-- Lint: Frontend build tooling present; lint command not documented in repo docs.
+- Tests: `php artisan test` passes locally (25 tests / 76 assertions as of 2026-03-21).
+- Lint: Frontend build tooling present; dedicated lint command still not documented in repo docs.
 - Security alerts: Not currently tracked in this file.
 - Dependency status: Managed through Composer/npm lockfiles.
 - CI status: Pipeline definition not documented in repo docs.
+
+## Product Readiness
+
+- Timezone support: Implemented for signed-in and guest `/today` resolution, account timezone persistence, and Settings UI editing.
+- Timezone behavior: Existing `entry_date` values stay stable; signed-in users resolve "today" from saved account timezone; guests resolve "today" from device/browser timezone.
+- Verification: `php artisan test` and `npm run build` both pass after timezone support changes.
 
 ## Hosting
 
@@ -32,6 +38,7 @@
 - Hosted production baseline is not fully documented.
 - Email deliverability setup is not yet documented.
 - Data durability and restore process are not yet documented.
+- Frontend test infrastructure is still missing; Settings UI coverage is tracked in backlog.
 
 ## Notes
 

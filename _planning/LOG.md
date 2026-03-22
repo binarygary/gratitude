@@ -22,3 +22,7 @@ Decisions, notable changes, and operational notes.
   - Confirm hosting provider, production URL, and operational runbooks.
   - Review imported beta plan items and split into prioritized backlog tasks.
   - Add CI/observability details to `STATUS.md` once configured.
+
+## Recent
+
+- 2026-03-21: Completed timezone support slice across `/today`, account settings persistence, and Settings UI; verified with `php artisan test` and `npm run build`.
