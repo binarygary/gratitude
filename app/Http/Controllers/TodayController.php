@@ -15,7 +15,7 @@ class TodayController extends Controller
     public function show(Request $request, EntryQueries $entryQueries): Response
     {
         $user = $request->user();
-        $timezone = $user?->timezone ?? $this->resolveGuestTimezone($request);
+        $timezone = $user !== null ? ($user->timezone ?? $this->resolveGuestTimezone($request)) : $this->resolveGuestTimezone($request);
         $requestedDate = $user !== null ? $request->query('date') : null;
 
         if (is_string($requestedDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requestedDate) === 1) {
@@ -55,7 +55,7 @@ class TodayController extends Controller
                 'updated_at' => Carbon::parse($entry->updated_at)->valueOf(),
             ] : null,
             'flashbacks' => $flashbacks,
-            'showFlashbacks' => (bool) ($user?->show_flashbacks ?? true),
+            'showFlashbacks' => (bool) ($user !== null ? $user->show_flashbacks : true),
             'isAuthenticated' => $user !== null,
             'loginPromptThreshold' => 3,
         ]);

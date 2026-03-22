@@ -2,9 +2,17 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $user_id
+ * @property CarbonInterface|string $entry_date
+ * @property string|null $person
+ * @property string|null $grace
+ * @property string|null $gratitude
+ */
 class Entry extends Model
 {
     protected $fillable = [
@@ -22,6 +30,7 @@ class Entry extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
