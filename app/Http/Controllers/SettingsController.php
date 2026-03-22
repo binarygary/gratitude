@@ -35,10 +35,8 @@ class SettingsController extends Controller
             'show_flashbacks' => $validated['show_flashbacks'],
         ]);
 
-        if ($timezoneChanged) {
-            return to_route('today.show')->with('status', 'Settings updated.');
-        }
+        $route = $timezoneChanged ? 'today.show' : 'settings.show';
 
-        return to_route('settings.show')->with('status', 'Settings updated.');
+        return to_route($route)->with('status', 'Settings updated.');
     }
 }
