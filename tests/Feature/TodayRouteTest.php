@@ -35,6 +35,18 @@ class TodayRouteTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_today_falls_back_to_app_timezone_for_invalid_guest_timezone(): void
+    {
+        Carbon::setTestNow('2026-03-21 10:30:00 UTC');
+
+        $response = $this->withHeader('X-Timezone', 'Mars/Olympus_Mons')->get('/today');
+
+        $response->assertOk();
+        $response->assertSee('2026-03-21');
+
+        Carbon::setTestNow();
+    }
+
     public function test_today_uses_saved_user_timezone_instead_of_browser_timezone(): void
     {
         Carbon::setTestNow('2026-03-21 10:30:00 UTC');
