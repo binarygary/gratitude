@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string|null $timezone
+ * @property bool $show_flashbacks
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -33,6 +40,7 @@ class User extends Authenticatable
         ];
     }
 
+    /** @return HasMany<Entry, $this> */
     public function entries(): HasMany
     {
         return $this->hasMany(Entry::class);

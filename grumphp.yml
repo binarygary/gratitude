@@ -1,0 +1,28 @@
+grumphp:
+  extensions:
+    - YieldStudio\GrumPHPLaravelPint\ExtensionLoader
+  tasks:
+    laravel_pint: null
+    phpstan:
+      autoload_file: ~
+      configuration: phpstan.neon
+      level: 5
+      force_patterns: []
+      ignore_patterns: ['tests/', 'config/', 'routes/']
+      triggered_by: ['php']
+      memory_limit: "-1"
+      use_grumphp_paths: true
+    composer:
+      file: ./composer.json
+      no_check_publish: true
+    pest:
+      config_file: ~
+      testsuite: ~
+      group: []
+      always_execute: false
+  testsuites:
+    git_commit:
+      tasks:
+        - phpstan
+        - laravel_pint
+        - pest

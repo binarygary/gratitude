@@ -7,6 +7,7 @@ use App\Mail\MagicLinkMail;
 use App\Models\MagicLoginToken;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,11 +71,16 @@ class MagicLinkController extends Controller
         abort_if($record === null, 403, 'This sign-in link is invalid or expired.');
 
         $record->forceFill(['used_at' => now()])->save();
+        $user = $record->user;
 
-        Auth::guard('web')->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
-        Auth::login($record->user, remember: true);
+        abort_if($user === null, 403, 'This sign-in link is invalid or expired.');
+
+        /** @var SessionGuard $guard */
+        $guard = Auth::guard('web');
+        $guard->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
+        $guard->login($user, remember: true);
         $request->session()->regenerate();
-        event(new Login('web', $record->user, true));
+        event(new Login('web', $user, true));
 
         return to_route('today.show')->with('status', 'Signed in successfully.');
     }

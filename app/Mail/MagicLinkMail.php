@@ -12,9 +12,7 @@ class MagicLinkMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public string $magicLink)
-    {
-    }
+    public function __construct(public string $magicLink) {}
 
     public function envelope(): Envelope
     {

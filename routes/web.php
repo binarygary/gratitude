@@ -3,9 +3,9 @@
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\EntryController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HistoryEntryController;
-use App\Http\Controllers\HelpController;
 use App\Http\Controllers\PoliciesController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TodayController;

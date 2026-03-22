@@ -34,6 +34,7 @@ class SyncController extends Controller
                     'status' => 'rejected',
                     'errors' => $entryValidator->errors()->toArray(),
                 ];
+
                 continue;
             }
 
