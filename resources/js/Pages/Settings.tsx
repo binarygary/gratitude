@@ -24,10 +24,9 @@ export default function Settings() {
     });
 
     const reminderIcsHref = useMemo(() => {
-        const safeTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
         const now = new Date();
         const dateParts = new Intl.DateTimeFormat('en-CA', {
-            timeZone: safeTimezone,
+            timeZone: deviceTimezone,
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -40,7 +39,7 @@ export default function Settings() {
         const [hour = '20', minute = '00'] = reminderTime.split(':');
         const dtStart = `${year}${month}${day}T${hour}${minute}00`;
         const stamp = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-        const uid = `consider-today-daily-reminder-${safeTimezone}-${hour}${minute}`;
+        const uid = `consider-today-daily-reminder-${deviceTimezone}-${hour}${minute}`;
 
         const calendar = [
             'BEGIN:VCALENDAR',
@@ -50,7 +49,7 @@ export default function Settings() {
             'BEGIN:VEVENT',
             `UID:${uid}`,
             `DTSTAMP:${stamp}`,
-            `DTSTART;TZID=${safeTimezone}:${dtStart}`,
+            `DTSTART;TZID=${deviceTimezone}:${dtStart}`,
             'RRULE:FREQ=DAILY',
             'SUMMARY:Daily consider.today reminder',
             'DESCRIPTION:Open consider.today and write today\\,s entry.',
@@ -59,7 +58,7 @@ export default function Settings() {
         ].join('\r\n');
 
         return `data:text/calendar;charset=utf-8,${encodeURIComponent(calendar)}`;
-    }, [reminderTime]);
+    }, [deviceTimezone, reminderTime]);
 
     return (
         <AppShell>
