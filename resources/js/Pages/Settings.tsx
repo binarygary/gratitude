@@ -17,6 +17,7 @@ type PageProps = {
 export default function Settings() {
     const { props } = usePage<PageProps>();
     const [reminderTime, setReminderTime] = useState('20:00');
+    const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     const form = useForm({
         timezone: props.timezone,
         show_flashbacks: props.show_flashbacks,
@@ -81,8 +82,9 @@ export default function Settings() {
                             value={form.data.timezone}
                             onChange={(event) => form.setData('timezone', event.target.value)}
                             placeholder="America/New_York"
-                            autoComplete="timezone"
                             spellCheck={false}
+                            aria-invalid={form.errors.timezone ? 'true' : 'false'}
+                            aria-describedby={form.errors.timezone ? 'timezone-error' : undefined}
                         />
                     </label>
                     <p className="text-sm text-base-content/70">
@@ -92,15 +94,19 @@ export default function Settings() {
                         <button
                             type="button"
                             className="btn btn-outline btn-sm rounded-xl"
-                            onClick={() => form.setData('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC')}
+                            onClick={() => form.setData('timezone', deviceTimezone)}
                         >
                             Use device timezone
                         </button>
                         <p className="self-center text-sm text-base-content/60">
-                            Current device timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'}
+                            Current device timezone: {deviceTimezone}
                         </p>
                     </div>
-                    {form.errors.timezone ? <p className="text-sm text-error">{form.errors.timezone}</p> : null}
+                    {form.errors.timezone ? (
+                        <p id="timezone-error" className="text-sm text-error" role="alert">
+                            {form.errors.timezone}
+                        </p>
+                    ) : null}
 
                     <label className="label cursor-pointer justify-start gap-3">
                         <input
