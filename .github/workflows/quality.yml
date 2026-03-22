@@ -35,7 +35,7 @@ jobs:
         with:
           php-version: "8.3"
           extensions: mbstring, pdo_sqlite
-          coverage: none
+          coverage: xdebug
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -68,3 +68,13 @@ jobs:
 
       - name: Run quality checks
         run: vendor/bin/grumphp run
+
+      - name: Generate test coverage report
+        run: php artisan test --coverage-text --coverage-clover=coverage/clover.xml
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-test-coverage
+          path: coverage/clover.xml
+          if-no-files-found: error

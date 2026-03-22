@@ -129,6 +129,8 @@ php artisan test --filter=ExampleTest
 XDEBUG_MODE=off vendor/bin/grumphp run
 ```
 
+- CI publishes an informational PHPUnit coverage summary in workflow logs and uploads a Clover report artifact. Coverage is reported, not enforced by a threshold.
+
 Current baseline tests are in:
 - `tests/Feature`
 - `tests/Unit`
