@@ -4,10 +4,12 @@ import AppShell from '../Components/AppShell';
 import SeoHead from '../Components/SeoHead';
 
 type PageProps = {
+    timezone: string;
     show_flashbacks: boolean;
     auth: {
         user: {
             email: string;
+            timezone: string;
         } | null;
     };
 };
@@ -15,15 +17,16 @@ type PageProps = {
 export default function Settings() {
     const { props } = usePage<PageProps>();
     const [reminderTime, setReminderTime] = useState('20:00');
+    const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     const form = useForm({
+        timezone: props.timezone,
         show_flashbacks: props.show_flashbacks,
     });
 
     const reminderIcsHref = useMemo(() => {
-        const safeTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
         const now = new Date();
         const dateParts = new Intl.DateTimeFormat('en-CA', {
-            timeZone: safeTimezone,
+            timeZone: deviceTimezone,
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -36,7 +39,7 @@ export default function Settings() {
         const [hour = '20', minute = '00'] = reminderTime.split(':');
         const dtStart = `${year}${month}${day}T${hour}${minute}00`;
         const stamp = now.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-        const uid = `consider-today-daily-reminder-${safeTimezone}-${hour}${minute}`;
+        const uid = `consider-today-daily-reminder-${deviceTimezone}-${hour}${minute}`;
 
         const calendar = [
             'BEGIN:VCALENDAR',
@@ -46,7 +49,7 @@ export default function Settings() {
             'BEGIN:VEVENT',
             `UID:${uid}`,
             `DTSTAMP:${stamp}`,
-            `DTSTART;TZID=${safeTimezone}:${dtStart}`,
+            `DTSTART;TZID=${deviceTimezone}:${dtStart}`,
             'RRULE:FREQ=DAILY',
             'SUMMARY:Daily consider.today reminder',
             'DESCRIPTION:Open consider.today and write today\\,s entry.',
@@ -55,7 +58,7 @@ export default function Settings() {
         ].join('\r\n');
 
         return `data:text/calendar;charset=utf-8,${encodeURIComponent(calendar)}`;
-    }, [reminderTime]);
+    }, [deviceTimezone, reminderTime]);
 
     return (
         <AppShell>
@@ -69,6 +72,40 @@ export default function Settings() {
             <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h1 className="text-3xl font-semibold text-base-content">Settings</h1>
+
+                    <label className="form-control gap-2">
+                        <span className="label-text text-base-content">Timezone</span>
+                        <input
+                            type="text"
+                            className="input input-bordered rounded-xl"
+                            value={form.data.timezone}
+                            onChange={(event) => form.setData('timezone', event.target.value)}
+                            placeholder="America/New_York"
+                            spellCheck={false}
+                            aria-invalid={form.errors.timezone ? 'true' : 'false'}
+                            aria-describedby={form.errors.timezone ? 'timezone-error' : undefined}
+                        />
+                    </label>
+                    <p className="text-sm text-base-content/70">
+                        Your saved timezone decides which date counts as &quot;today&quot; after you sign in. Existing entry dates do not change.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            className="btn btn-outline btn-sm rounded-xl"
+                            onClick={() => form.setData('timezone', deviceTimezone)}
+                        >
+                            Use device timezone
+                        </button>
+                        <p className="self-center text-sm text-base-content/60">
+                            Current device timezone: {deviceTimezone}
+                        </p>
+                    </div>
+                    {form.errors.timezone ? (
+                        <p id="timezone-error" className="text-sm text-error" role="alert">
+                            {form.errors.timezone}
+                        </p>
+                    ) : null}
 
                     <label className="label cursor-pointer justify-start gap-3">
                         <input
