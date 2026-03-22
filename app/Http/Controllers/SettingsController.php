@@ -23,13 +23,17 @@ class SettingsController extends Controller
     {
         $user = $request->user();
         $validated = $request->validate([
-            'timezone' => ['required', 'string', 'timezone:all'],
+            'timezone' => ['sometimes', 'string', 'timezone:all'],
             'show_flashbacks' => ['required', 'boolean'],
         ]);
 
-        $timezoneChanged = $validated['timezone'] !== $user->timezone;
+        $timezone = $validated['timezone'] ?? $user->timezone;
+        $timezoneChanged = $timezone !== $user->timezone;
 
-        $user->update($validated);
+        $user->update([
+            'timezone' => $timezone,
+            'show_flashbacks' => $validated['show_flashbacks'],
+        ]);
 
         if ($timezoneChanged) {
             return to_route('today.show')->with('status', 'Settings updated.');
