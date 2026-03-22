@@ -14,17 +14,26 @@ class SettingsController extends Controller
         $user = $request->user();
 
         return Inertia::render('Settings', [
+            'timezone' => $user->timezone,
             'show_flashbacks' => (bool) $user->show_flashbacks,
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
+        $user = $request->user();
         $validated = $request->validate([
+            'timezone' => ['required', 'string', 'timezone:all'],
             'show_flashbacks' => ['required', 'boolean'],
         ]);
 
-        $request->user()->update($validated);
+        $timezoneChanged = $validated['timezone'] !== $user->timezone;
+
+        $user->update($validated);
+
+        if ($timezoneChanged) {
+            return to_route('today.show')->with('status', 'Settings updated.');
+        }
 
         return to_route('settings.show')->with('status', 'Settings updated.');
     }
