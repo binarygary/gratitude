@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\EntryController;
