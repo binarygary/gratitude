@@ -49,6 +49,25 @@ composer setup
 - install frontend dependencies
 - build frontend assets
 
+### Codex Cloud / isolated repo use
+
+This repo is intended to work cleanly as a standalone checkout in Codex cloud.
+
+From the repo root, a fresh session should usually start with:
+
+```bash
+composer setup
+```
+
+Then use:
+
+```bash
+composer test
+XDEBUG_MODE=off vendor/bin/grumphp run
+```
+
+Use `composer dev` only when you need the full local app stack.
+
 ### 3. Run the app locally
 
 ```bash
@@ -66,7 +85,9 @@ Open `http://127.0.0.1:8000` (or the URL shown by `php artisan serve`).
 ## Configuration Notes
 
 - Default local DB is SQLite (`DB_CONNECTION=sqlite`).
+- The checked-in `database/database.sqlite` file supports SQLite-first bootstrap in fresh environments.
 - Magic-link emails use the `log` mailer by default (`MAIL_MAILER=log`), so links are written to `storage/logs/laravel.log`.
+- If you need externally usable magic-link URLs in a cloud session, set `APP_URL` to the active app URL for that session.
 Main routes:
 - `/today`
 - `/history`
@@ -102,6 +123,11 @@ php artisan test --filter=ExampleTest
 - Tests run with `APP_ENV=testing`.
 - DB is in-memory SQLite (`DB_DATABASE=:memory:`).
 - Mailer is `array` in tests (emails are not sent).
+- Final repo-local verification is:
+
+```bash
+XDEBUG_MODE=off vendor/bin/grumphp run
+```
 
 Current baseline tests are in:
 - `tests/Feature`
