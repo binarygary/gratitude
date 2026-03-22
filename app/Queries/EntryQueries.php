@@ -32,6 +32,9 @@ class EntryQueries
             ->first();
     }
 
+    /**
+     * @return array{entry_date:string,person:string,grace:string,gratitude:string}|null
+     */
     public function snippet(?Entry $entry): ?array
     {
         if ($entry === null) {

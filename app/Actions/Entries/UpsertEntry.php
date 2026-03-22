@@ -8,6 +8,10 @@ use Carbon\Carbon;
 
 class UpsertEntry
 {
+    /**
+     * @param  array{entry_date:string,updated_at:int|string,person?:string|null,grace?:string|null,gratitude?:string|null}  $payload
+     * @return array{status:'skipped'|'upserted',entry:Entry|null}
+     */
     public function execute(User $user, array $payload): array
     {
         $entryDate = Carbon::parse($payload['entry_date'])->toDateString();
