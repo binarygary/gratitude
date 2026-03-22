@@ -88,6 +88,7 @@ Open `http://127.0.0.1:8000` (or the URL shown by `php artisan serve`).
 - The checked-in `database/database.sqlite` file supports SQLite-first bootstrap in fresh environments.
 - Magic-link emails use the `log` mailer by default (`MAIL_MAILER=log`), so links are written to `storage/logs/laravel.log`.
 - If you need externally usable magic-link URLs in a cloud session, set `APP_URL` to the active app URL for that session.
+- Automated dependency update PRs are configured with Dependabot for both Composer and npm on a weekly cadence. Minor and patch updates are grouped per ecosystem to keep review volume manageable.
 Main routes:
 - `/today`
 - `/history`
