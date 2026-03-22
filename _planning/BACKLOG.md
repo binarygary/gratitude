@@ -15,6 +15,7 @@ Keep items small, actionable, and link to issues/PRs when they exist.
 - Add Turnstile to magic-link request flow and verify abuse resistance.
 - Harden auth/session settings for production and validate invalid/expired token behavior.
 - Add/expand tests for timezone-sensitive logic and notification behavior.
+- Implement CI tests using GrumPHP.
 - Improve friend-share onboarding copy to increase awareness via direct sharing.
 
 ## P2

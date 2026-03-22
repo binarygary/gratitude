@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Queries\EntryQueries;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,7 +15,7 @@ class TodayController extends Controller
     public function show(Request $request, EntryQueries $entryQueries): Response
     {
         $user = $request->user();
-        $timezone = $user?->timezone ?? config('app.timezone', 'UTC');
+        $timezone = $user?->timezone ?? $this->resolveGuestTimezone($request);
         $requestedDate = $user !== null ? $request->query('date') : null;
 
         if (is_string($requestedDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $requestedDate) === 1) {
@@ -58,5 +59,16 @@ class TodayController extends Controller
             'isAuthenticated' => $user !== null,
             'loginPromptThreshold' => 3,
         ]);
+    }
+
+    private function resolveGuestTimezone(Request $request): string
+    {
+        $timezone = $request->header('X-Timezone');
+
+        if (is_string($timezone) && in_array($timezone, DateTimeZone::listIdentifiers(), true)) {
+            return $timezone;
+        }
+
+        return config('app.timezone', 'UTC');
     }
 }
