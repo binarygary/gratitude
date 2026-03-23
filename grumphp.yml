@@ -2,6 +2,15 @@ grumphp:
   extensions:
     - YieldStudio\GrumPHPLaravelPint\ExtensionLoader
   tasks:
+    npm_script:
+      script: typecheck
+      is_run_task: true
+      triggered_by: ['ts', 'tsx']
+    eslint:
+      bin: node_modules/.bin/eslint
+      triggered_by: ['js', 'ts', 'tsx']
+      whitelist_patterns: ['resources/js/']
+      max_warnings: 0
     laravel_pint: null
     phpstan:
       autoload_file: ~
@@ -23,6 +32,8 @@ grumphp:
   testsuites:
     git_commit:
       tasks:
+        - npm_script
+        - eslint
         - phpstan
         - laravel_pint
         - pest
