@@ -65,7 +65,6 @@ jobs:
 
       - name: Run frontend typecheck
         run: npm run typecheck
-
       - name: Build frontend assets
         run: npm run build
 
