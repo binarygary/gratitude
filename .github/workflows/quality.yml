@@ -61,7 +61,7 @@ jobs:
           php artisan config:clear
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run frontend typecheck
         run: npm run typecheck
