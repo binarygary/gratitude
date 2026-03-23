@@ -54,6 +54,12 @@ function buildCsv(entries: LocalEntry[]): string {
     return [header, ...rows].map((columns) => columns.map((column) => escapeCsv(column ?? '')).join(',')).join('\n');
 }
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+    const buffer = new ArrayBuffer(bytes.byteLength);
+    new Uint8Array(buffer).set(bytes);
+    return buffer;
+}
+
 function escapePdfText(value: string): string {
     return value
         .replace(/\\/g, '\\\\')
@@ -221,6 +227,6 @@ export async function exportEntries(format: ExportFormat): Promise<number> {
     }
 
     const pdfBytes = buildPdf(entries);
-    triggerDownload(new Blob([pdfBytes], { type: 'application/pdf' }), `consider-today-export-${stamp}.pdf`);
+    triggerDownload(new Blob([toArrayBuffer(pdfBytes)], { type: 'application/pdf' }), `consider-today-export-${stamp}.pdf`);
     return entries.length;
 }

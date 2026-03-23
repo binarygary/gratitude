@@ -63,6 +63,7 @@ Then use:
 
 ```bash
 composer test
+npm run typecheck
 XDEBUG_MODE=off vendor/bin/grumphp run
 ```
 
@@ -126,6 +127,7 @@ php artisan test --filter=ExampleTest
 - Final repo-local verification is:
 
 ```bash
+npm run typecheck
 XDEBUG_MODE=off vendor/bin/grumphp run
 ```
 
