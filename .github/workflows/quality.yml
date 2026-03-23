@@ -63,6 +63,9 @@ jobs:
       - name: Install Node dependencies
         run: npm install
 
+      - name: Install rolldown Linux binding
+        run: npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.10
+
       - name: Run frontend typecheck
         run: npm run typecheck
       - name: Build frontend assets
