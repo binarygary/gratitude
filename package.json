@@ -29,7 +29,8 @@
         "vite": "^8.0.1"
     },
     "optionalDependencies": {
-        "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.10"
+        "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.10",
+        "lightningcss-linux-x64-gnu": "1.32.0"
     },
     "dependencies": {
         "@inertiajs/react": "^2.3.18",
