@@ -89,7 +89,7 @@
         @inertiaHead
     </head>
     <body class="min-h-screen bg-base-100 text-base-content">
-        <script data-page="app" type="application/json">{!! json_encode($page) !!}</script>
+        <script data-page="app" type="application/json">@json($page)</script>
         <div id="app"></div>
     </body>
 </html>

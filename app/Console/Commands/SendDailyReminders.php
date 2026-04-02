@@ -6,6 +6,7 @@ use App\Mail\DailyReminderMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 class SendDailyReminders extends Command
@@ -20,7 +21,7 @@ class SendDailyReminders extends Command
             ->where('notifications_enabled', true)
             ->where('notification_channel', 'email')
             ->whereNotNull('daily_reminder_time')
-            ->get();
+            ->lazyById();
 
         $sentCount = 0;
 
@@ -28,16 +29,12 @@ class SendDailyReminders extends Command
             $timezone = $user->timezone ?: config('app.timezone', 'UTC');
             $localNow = Carbon::now($timezone);
             $localDate = $localNow->toDateString();
-
-            $lastSentOn = $user->daily_reminder_last_sent_on;
-
-            if ($lastSentOn !== null && Carbon::parse($lastSentOn)->toDateString() === $localDate) {
-                continue;
-            }
+            $dailyReminderTime = trim((string) $user->daily_reminder_time);
+            $timeFormat = strlen($dailyReminderTime) === 8 ? 'H:i:s' : 'H:i';
 
             $dueAt = Carbon::createFromFormat(
-                'Y-m-d H:i',
-                sprintf('%s %s', $localDate, $user->daily_reminder_time),
+                'Y-m-d '.$timeFormat,
+                sprintf('%s %s', $localDate, $dailyReminderTime),
                 $timezone,
             );
 
@@ -45,11 +42,27 @@ class SendDailyReminders extends Command
                 continue;
             }
 
-            Mail::to($user->email)->send(new DailyReminderMail($user));
+            $lock = Cache::lock(sprintf('daily-reminder:%d:%s', $user->id, $localDate), 300);
 
-            $user->forceFill([
-                'daily_reminder_last_sent_on' => $localDate,
-            ])->save();
+            if (! $lock->get()) {
+                continue;
+            }
+
+            try {
+                $lastSentOn = $user->daily_reminder_last_sent_on;
+
+                if ($lastSentOn !== null && Carbon::parse($lastSentOn)->toDateString() === $localDate) {
+                    continue;
+                }
+
+                Mail::to($user->email)->send(new DailyReminderMail($user));
+
+                $user->forceFill([
+                    'daily_reminder_last_sent_on' => $localDate,
+                ])->save();
+            } finally {
+                $lock->release();
+            }
 
             $sentCount++;
         }

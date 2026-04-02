@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
  * @property bool $notifications_enabled
  * @property string|null $notification_channel
  * @property string|null $daily_reminder_time
- * @property string|null $daily_reminder_last_sent_on
+ * @property Carbon|null $daily_reminder_last_sent_on
  */
 class User extends Authenticatable
 {

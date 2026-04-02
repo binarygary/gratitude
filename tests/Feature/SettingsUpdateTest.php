@@ -169,4 +169,34 @@ class SettingsUpdateTest extends TestCase
         $this->assertNull($user->notification_channel);
         $this->assertNull($user->daily_reminder_time);
     }
+
+    public function test_settings_update_defaults_notification_channel_to_email_when_enabled(): void
+    {
+        $user = User::factory()->create([
+            'timezone' => 'America/New_York',
+            'show_flashbacks' => true,
+            'notifications_enabled' => false,
+            'notification_channel' => null,
+            'daily_reminder_time' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/settings')
+            ->post('/settings', [
+                'timezone' => 'America/New_York',
+                'show_flashbacks' => true,
+                'notifications_enabled' => true,
+                'daily_reminder_time' => '20:15',
+            ]);
+
+        $response->assertRedirect('/settings');
+        $response->assertSessionHas('status', 'Settings updated.');
+
+        $user->refresh();
+
+        $this->assertTrue($user->notifications_enabled);
+        $this->assertSame('email', $user->notification_channel);
+        $this->assertSame('20:15', $user->daily_reminder_time);
+    }
 }

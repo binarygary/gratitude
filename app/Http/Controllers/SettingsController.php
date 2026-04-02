@@ -18,7 +18,7 @@ class SettingsController extends Controller
             'show_flashbacks' => (bool) $user->show_flashbacks,
             'notifications_enabled' => (bool) $user->notifications_enabled,
             'notification_channel' => $user->notification_channel,
-            'daily_reminder_time' => $user->daily_reminder_time,
+            'daily_reminder_time' => $this->normalizeReminderTime($user->daily_reminder_time),
         ]);
     }
 
@@ -38,7 +38,9 @@ class SettingsController extends Controller
         $notificationsEnabled = array_key_exists('notifications_enabled', $validated)
             ? (bool) $validated['notifications_enabled']
             : (bool) $user->notifications_enabled;
-        $notificationChannel = $notificationsEnabled ? ($validated['notification_channel'] ?? null) : null;
+        $notificationChannel = $notificationsEnabled
+            ? ($validated['notification_channel'] ?? $user->notification_channel ?? 'email')
+            : null;
         $dailyReminderTime = $notificationsEnabled ? ($validated['daily_reminder_time'] ?? null) : null;
 
         $user->update([
@@ -52,5 +54,14 @@ class SettingsController extends Controller
         $route = $timezoneChanged ? 'today.show' : 'settings.show';
 
         return to_route($route)->with('status', 'Settings updated.');
+    }
+
+    private function normalizeReminderTime(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return substr($value, 0, 5);
     }
 }

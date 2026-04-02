@@ -54,23 +54,37 @@ class SendDailyRemindersCommandTest extends TestCase
             'daily_reminder_last_sent_on' => null,
         ]);
 
+        $secondsUser = User::factory()->create([
+            'email' => 'seconds@example.com',
+            'timezone' => 'America/New_York',
+            'notifications_enabled' => true,
+            'notification_channel' => 'email',
+            'daily_reminder_time' => '20:15:00',
+            'daily_reminder_last_sent_on' => null,
+        ]);
+
         $this->artisan('notifications:send-daily-reminders')
             ->assertExitCode(0);
 
         Mail::assertSent(DailyReminderMail::class, function (DailyReminderMail $mail) use ($dueUser): bool {
             return $mail->hasTo($dueUser->email);
         });
-        Mail::assertSentCount(1);
+        Mail::assertSent(DailyReminderMail::class, function (DailyReminderMail $mail) use ($secondsUser): bool {
+            return $mail->hasTo($secondsUser->email);
+        });
+        Mail::assertSentCount(2);
 
         $dueUser->refresh();
         $alreadySentUser->refresh();
         $notDueUser->refresh();
         $disabledUser->refresh();
+        $secondsUser->refresh();
 
         $this->assertSame('2026-04-01', $dueUser->daily_reminder_last_sent_on?->toDateString());
         $this->assertSame('2026-04-01', $alreadySentUser->daily_reminder_last_sent_on?->toDateString());
         $this->assertNull($notDueUser->daily_reminder_last_sent_on);
         $this->assertNull($disabledUser->daily_reminder_last_sent_on);
+        $this->assertSame('2026-04-01', $secondsUser->daily_reminder_last_sent_on?->toDateString());
 
         Carbon::setTestNow();
     }
