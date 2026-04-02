@@ -15,6 +15,9 @@ type PageModule = {
 };
 
 createInertiaApp({
+    // The runtime supports this flag even when the published adapter types lag behind.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     defaults: {
         future: {
             useScriptElementForInitialPage: true,
