@@ -6,21 +6,30 @@ import SeoHead from '../Components/SeoHead';
 type PageProps = {
     timezone: string;
     show_flashbacks: boolean;
+    notifications_enabled: boolean;
+    notification_channel: string | null;
+    daily_reminder_time: string | null;
     auth: {
         user: {
             email: string;
             timezone: string;
+            notifications_enabled?: boolean;
+            notification_channel?: string | null;
+            daily_reminder_time?: string | null;
         } | null;
     };
 };
 
 export default function Settings() {
     const { props } = usePage<PageProps>();
-    const [reminderTime, setReminderTime] = useState('20:00');
+    const [reminderTime, setReminderTime] = useState(props.daily_reminder_time ?? '20:00');
     const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     const form = useForm({
         timezone: props.timezone,
         show_flashbacks: props.show_flashbacks,
+        notifications_enabled: props.notifications_enabled,
+        notification_channel: props.notification_channel ?? 'email',
+        daily_reminder_time: props.daily_reminder_time ?? '20:00',
     });
 
     const reminderIcsHref = useMemo(() => {
@@ -138,17 +147,51 @@ export default function Settings() {
             <div className="card rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm">
                 <div className="card-body gap-4 p-6">
                     <h2 className="text-lg font-medium text-base-content">Reminders</h2>
-                    <p className="text-sm text-base-content/70">Coming later. You can still add a daily reminder to your calendar today.</p>
+                    <p className="text-sm text-base-content/70">
+                        Start with one daily email reminder. The calendar download remains available as a backup while hosted delivery is being verified.
+                    </p>
+
+                    <label className="label cursor-pointer justify-start gap-3">
+                        <input
+                            type="checkbox"
+                            className="toggle"
+                            checked={form.data.notifications_enabled}
+                            onChange={(event) => form.setData('notifications_enabled', event.target.checked)}
+                        />
+                        <span className="label-text text-base-content">Enable daily reminders</span>
+                    </label>
+
+                    <div className="rounded-xl border border-base-300/60 bg-base-200/30 p-4">
+                        <p className="text-sm font-medium text-base-content">Delivery channel</p>
+                        <p className="mt-1 text-sm text-base-content/70">Email only for the first beta slice.</p>
+                    </div>
 
                     <label className="form-control w-full max-w-xs gap-2">
                         <span className="label-text text-base-content">Reminder time</span>
                         <input
                             type="time"
                             className="input input-bordered rounded-xl"
-                            value={reminderTime}
-                            onChange={(event) => setReminderTime(event.target.value)}
+                            value={form.data.daily_reminder_time}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                form.setData('daily_reminder_time', value);
+                                setReminderTime(value);
+                            }}
+                            disabled={!form.data.notifications_enabled}
                         />
                     </label>
+
+                    {form.errors.notification_channel ? (
+                        <p className="text-sm text-error" role="alert">
+                            {form.errors.notification_channel}
+                        </p>
+                    ) : null}
+
+                    {form.errors.daily_reminder_time ? (
+                        <p className="text-sm text-error" role="alert">
+                            {form.errors.daily_reminder_time}
+                        </p>
+                    ) : null}
 
                     <a
                         className="btn btn-outline btn-sm w-fit"

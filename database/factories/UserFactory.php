@@ -30,6 +30,12 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'timezone' => 'America/New_York',
+            'show_flashbacks' => true,
+            'notifications_enabled' => false,
+            'notification_channel' => null,
+            'daily_reminder_time' => null,
+            'daily_reminder_last_sent_on' => null,
         ];
     }
 

@@ -4,7 +4,6 @@ Keep items small, actionable, and link to issues/PRs when they exist.
 
 ## P0
 
-- [Beta gate] Timezone support complete and verified across create/edit/display + date rollover cases.
 - [Beta gate] Notifications MVP shipped with clear user controls and delivery verification.
 - [Beta gate] Observability baseline live for app errors, request latency, and critical flows (auth/sync).
 - [Beta gate] Admin panel MVP available for beta operations/support.
@@ -12,6 +11,7 @@ Keep items small, actionable, and link to issues/PRs when they exist.
 
 ## P1
 
+- [Done 2026-03-21] Timezone support complete and verified across create/edit/display + date rollover cases.
 - Add Turnstile to magic-link request flow and verify abuse resistance.
 - Harden auth/session settings for production and validate invalid/expired token behavior.
 - Add/expand tests for timezone-sensitive logic and notification behavior.

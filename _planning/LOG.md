@@ -26,3 +26,5 @@ Decisions, notable changes, and operational notes.
 ## Recent
 
 - 2026-03-21: Completed timezone support slice across `/today`, account settings persistence, and Settings UI; verified with `php artisan test` and `npm run build`.
+- 2026-04-01: Reprioritized planning to make Notifications MVP the top active beta gate and added `docs/plans/2026-04-01-notifications-mvp.md`.
+- 2026-04-01: Implemented daily reminder notification preferences and the `notifications:send-daily-reminders` email delivery command; verified with targeted feature tests and `npm run build`.

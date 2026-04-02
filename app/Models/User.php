@@ -14,6 +14,10 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email
  * @property string|null $timezone
  * @property bool $show_flashbacks
+ * @property bool $notifications_enabled
+ * @property string|null $notification_channel
+ * @property string|null $daily_reminder_time
+ * @property string|null $daily_reminder_last_sent_on
  */
 class User extends Authenticatable
 {
@@ -26,6 +30,10 @@ class User extends Authenticatable
         'password',
         'timezone',
         'show_flashbacks',
+        'notifications_enabled',
+        'notification_channel',
+        'daily_reminder_time',
+        'daily_reminder_last_sent_on',
     ];
 
     protected $hidden = [
@@ -39,6 +47,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'show_flashbacks' => 'boolean',
+            'notifications_enabled' => 'boolean',
+            'daily_reminder_last_sent_on' => 'date:Y-m-d',
         ];
     }
 

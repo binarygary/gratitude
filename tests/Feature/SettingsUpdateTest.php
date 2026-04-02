@@ -104,4 +104,69 @@ class SettingsUpdateTest extends TestCase
         $this->assertSame('America/New_York', $user->timezone);
         $this->assertTrue($user->show_flashbacks);
     }
+
+    public function test_settings_update_persists_notification_preferences(): void
+    {
+        $user = User::factory()->create([
+            'timezone' => 'America/New_York',
+            'show_flashbacks' => true,
+            'notifications_enabled' => false,
+            'notification_channel' => null,
+            'daily_reminder_time' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/settings')
+            ->post('/settings', [
+                'timezone' => 'America/New_York',
+                'show_flashbacks' => true,
+                'notifications_enabled' => true,
+                'notification_channel' => 'email',
+                'daily_reminder_time' => '20:15',
+            ]);
+
+        $response->assertRedirect('/settings');
+        $response->assertSessionHas('status', 'Settings updated.');
+
+        $user->refresh();
+
+        $this->assertTrue($user->notifications_enabled);
+        $this->assertSame('email', $user->notification_channel);
+        $this->assertSame('20:15', $user->daily_reminder_time);
+    }
+
+    public function test_settings_update_rejects_invalid_notification_channel_and_time(): void
+    {
+        $user = User::factory()->create([
+            'timezone' => 'America/New_York',
+            'show_flashbacks' => true,
+            'notifications_enabled' => false,
+            'notification_channel' => null,
+            'daily_reminder_time' => null,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/settings')
+            ->post('/settings', [
+                'timezone' => 'America/New_York',
+                'show_flashbacks' => true,
+                'notifications_enabled' => true,
+                'notification_channel' => 'sms',
+                'daily_reminder_time' => '8pm',
+            ]);
+
+        $response->assertRedirect('/settings');
+        $response->assertSessionHasErrors([
+            'notification_channel',
+            'daily_reminder_time',
+        ]);
+
+        $user->refresh();
+
+        $this->assertFalse($user->notifications_enabled);
+        $this->assertNull($user->notification_channel);
+        $this->assertNull($user->daily_reminder_time);
+    }
 }

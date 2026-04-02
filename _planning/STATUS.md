@@ -18,6 +18,7 @@
 
 - Timezone support: Implemented for signed-in and guest `/today` resolution, account timezone persistence, and Settings UI editing.
 - Timezone behavior: Existing `entry_date` values stay stable; signed-in users resolve "today" from saved account timezone; guests resolve "today" from device/browser timezone.
+- Notifications MVP: Daily email reminders can now be configured from Settings with opt-in/out, reminder time selection, and duplicate protection by local date.
 - Verification: `php artisan test` and `npm run build` both pass after timezone support changes.
 
 ## Hosting
@@ -39,6 +40,7 @@
 - Email deliverability setup is not yet documented.
 - Data durability and restore process are not yet documented.
 - Frontend test infrastructure is still missing; Settings UI coverage is tracked in backlog.
+- Reminder delivery depends on hosted mailer configuration plus a recurring `notifications:send-daily-reminders` invocation.
 
 ## Notes
 
