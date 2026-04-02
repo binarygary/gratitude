@@ -16,13 +16,11 @@ type PageModule = {
 
 createInertiaApp({
     // The runtime supports this flag even when the published adapter types lag behind.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     defaults: {
         future: {
             useScriptElementForInitialPage: true,
         },
-    },
+    } as unknown as never,
     resolve: async (name) => {
         const page = await resolvePageComponent<PageModule>(`./Pages/${name}.tsx`, import.meta.glob<PageModule>('./Pages/**/*.tsx'));
 
