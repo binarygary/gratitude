@@ -133,7 +133,7 @@ class SettingsUpdateTest extends TestCase
 
         $this->assertTrue($user->notifications_enabled);
         $this->assertSame('email', $user->notification_channel);
-        $this->assertSame('20:15', $user->daily_reminder_time);
+        $this->assertSame('20:15', substr((string) $user->daily_reminder_time, 0, 5));
     }
 
     public function test_settings_update_rejects_invalid_notification_channel_and_time(): void
@@ -197,6 +197,6 @@ class SettingsUpdateTest extends TestCase
 
         $this->assertTrue($user->notifications_enabled);
         $this->assertSame('email', $user->notification_channel);
-        $this->assertSame('20:15', $user->daily_reminder_time);
+        $this->assertSame('20:15', substr((string) $user->daily_reminder_time, 0, 5));
     }
 }

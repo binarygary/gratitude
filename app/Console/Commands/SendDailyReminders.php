@@ -55,7 +55,13 @@ class SendDailyReminders extends Command
                     continue;
                 }
 
-                Mail::to($user->email)->send(new DailyReminderMail($user));
+                try {
+                    Mail::to($user->email)->send(new DailyReminderMail($user));
+                } catch (\Throwable $exception) {
+                    report($exception);
+
+                    continue;
+                }
 
                 $user->forceFill([
                     'daily_reminder_last_sent_on' => $localDate,

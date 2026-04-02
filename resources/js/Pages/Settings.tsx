@@ -178,6 +178,8 @@ export default function Settings() {
                                 setReminderTime(value);
                             }}
                             disabled={!form.data.notifications_enabled}
+                            aria-invalid={form.errors.daily_reminder_time ? 'true' : 'false'}
+                            aria-describedby={form.errors.daily_reminder_time ? 'daily-reminder-time-error' : undefined}
                         />
                     </label>
 
@@ -188,7 +190,7 @@ export default function Settings() {
                     ) : null}
 
                     {form.errors.daily_reminder_time ? (
-                        <p className="text-sm text-error" role="alert">
+                        <p id="daily-reminder-time-error" className="text-sm text-error" role="alert">
                             {form.errors.daily_reminder_time}
                         </p>
                     ) : null}
