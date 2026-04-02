@@ -1,6 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
+import { config } from '@inertiajs/core';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { ComponentType, ReactNode } from 'react';
@@ -14,12 +15,9 @@ type PageModule = {
     default: PageComponent;
 };
 
+config.set('future.useScriptElementForInitialPage', true);
+
 createInertiaApp({
-    defaults: {
-        future: {
-            useScriptElementForInitialPage: true,
-        },
-    },
     resolve: async (name) => {
         const page = await resolvePageComponent<PageModule>(`./Pages/${name}.tsx`, import.meta.glob<PageModule>('./Pages/**/*.tsx'));
 
