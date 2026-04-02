@@ -65,4 +65,13 @@ class TodayRouteTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function test_today_renders_inertia_script_element_boot_payload(): void
+    {
+        $response = $this->get('/today');
+
+        $response->assertOk();
+        $response->assertSee('<script data-page="app" type="application/json">', false);
+        $response->assertSee('<div id="app"></div>', false);
+    }
 }
