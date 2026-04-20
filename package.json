@@ -17,16 +17,16 @@
         "@tailwindcss/vite": "^4.2.2",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "axios": "^1.13.6",
+        "axios": "^1.15.1",
         "concurrently": "^9.0.1",
         "eslint": "^9.39.4",
-        "eslint-plugin-react-hooks": "^7.0.1",
-        "globals": "^17.4.0",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "globals": "^17.5.0",
         "laravel-vite-plugin": "^3.0.0",
         "tailwindcss": "^4.2.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.57.1",
-        "vite": "^8.0.1"
+        "typescript-eslint": "^8.58.2",
+        "vite": "^8.0.9"
     },
     "optionalDependencies": {
         "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.10",
@@ -34,11 +34,11 @@
         "lightningcss-linux-x64-gnu": "1.32.0"
     },
     "dependencies": {
-        "@inertiajs/react": "^3.0.1",
+        "@inertiajs/react": "^3.0.3",
         "@tailwindcss/forms": "^0.5.11",
         "daisyui": "^5.5.18",
         "dexie": "^4.3.0",
-        "react": "^19.2.4",
-        "react-dom": "^19.2.4"
+        "react": "^19.2.5",
+        "react-dom": "^19.2.5"
     }
 }
