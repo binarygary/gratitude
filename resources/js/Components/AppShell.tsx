@@ -27,6 +27,14 @@ const themeLabel: Record<ThemePreference, string> = {
     dim: 'Dark',
 };
 
+function storedThemePreference(): ThemePreference {
+    const savedTheme = localStorage.getItem('theme');
+
+    return savedTheme === 'retro' || savedTheme === 'dim' || savedTheme === 'system'
+        ? savedTheme
+        : 'system';
+}
+
 function ThemeIcon({ preference }: { preference: ThemePreference }) {
     if (preference === 'retro') {
         return (
@@ -57,22 +65,13 @@ export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
-    const [themePreference, setThemePreference] = useState<ThemePreference>('system');
+    const [themePreference, setThemePreference] = useState<ThemePreference>(storedThemePreference);
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const loginDropdownRef = useRef<HTMLDivElement | null>(null);
 
     const loginForm = useForm({ email: '' });
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        const nextPreference = savedTheme === 'retro' || savedTheme === 'dim' || savedTheme === 'system'
-            ? savedTheme
-            : 'system';
-
-        setThemePreference(nextPreference);
-    }, []);
 
     useEffect(() => {
         const root = document.documentElement;
