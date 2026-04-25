@@ -35,7 +35,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Rejected entries stop retrying indefinitely and give the user a recoverable state.
   4. Oversized batches and entry fields are rejected with clear item-level or request-level feedback.
   5. Beta UI and documentation accurately state restore limits unless a verified pull/restore flow exists.
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 01-01-PLAN.md - Shared backend validation limits and canonical entry serializer.
+- [ ] 01-02-PLAN.md - Canonical batch sync response contract and conflict semantics.
+- [ ] 01-03-PLAN.md - Frontend unit harness and Dexie explicit sync-state migration.
+- [ ] 01-04-PLAN.md - Result-aware local sync writes for synced, failed, rejected, and conflict outcomes.
+- [ ] 01-05-PLAN.md - User-visible sync statuses, recovery copy, restore-limit copy, and final gate.
 **UI hint**: yes
 
 ### Phase 2: Auth & Session Hardening
