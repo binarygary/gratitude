@@ -469,7 +469,7 @@ export default function Today() {
         '@id': `${todayUrl}#app`,
         name: 'consider.today',
         url: todayUrl,
-        description: 'A daily gratitude reflection app with three prompts and optional cross-device sync.',
+        description: 'A daily gratitude reflection app with three prompts, local-first storage, and optional signed-in backup.',
         applicationCategory: 'LifestyleApplication',
         operatingSystem: 'Any',
         offers: {
@@ -480,7 +480,7 @@ export default function Today() {
         featureList: [
             'Daily three-prompt gratitude journal',
             'Private by default with local-first storage',
-            'Optional sync across devices after sign in',
+            'Optional backup for entries that sync successfully after sign in',
             'History and reflection flashbacks',
         ],
     };
@@ -531,7 +531,7 @@ export default function Today() {
                             <p className="text-sm text-base-content/70">This is your 3-prompt gratitude journal.</p>
                             <p className="text-sm text-base-content/70">Private by default. Your entries stay on your local device until you decide otherwise.</p>
                             <p className="text-sm text-base-content/70">
-                                Entries can be exported anytime. Sign in to sync so your reflections are available across devices.
+                                Sign in to back up entries that sync successfully. Full restore on a new device is limited in this beta.
                             </p>
                         </>
                     )}
@@ -590,7 +590,7 @@ export default function Today() {
                 </div>
                 {!props.auth.user && savedCount >= props.loginPromptThreshold && (
                     <div className="alert alert-info py-2">
-                        Sync and backup across devices is optional. Use the sign in button in the header.
+                        Sync is optional. It backs up entries that sync successfully; keep exporting if you need a full portable copy.
                     </div>
                 )}
                 {syncStatusAlertEntry && (
