@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-04-25T01:47:18.101Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-04-25T01:57:24.511Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 01 (sync-contract-local-state) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-25
 
@@ -53,6 +53,7 @@ Progress: [----------] 0%
 
 *Updated after each plan completion*
 | Phase 01-sync-contract-local-state P01 | 6 min | 2 tasks | 7 files |
+| Phase 01-sync-contract-local-state P02 | 5 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Recent decisions affecting current work:
 - [Phase 01-sync-contract-local-state]: Use one shared EntryPayloadRules contract for direct saves and sync item validation. — Prevents validation drift between /entries/upsert and /api/sync/push while keeping per-item sync validation compatible with Validator::make.
 - [Phase 01-sync-contract-local-state]: Keep the existing sync push result shape in Plan 01. — Plan 01 is the shared validation and direct-save serializer foundation; canonical batch item payloads and conflict semantics remain Plan 02 scope.
 - [Phase 01-sync-contract-local-state]: Commit TDD RED tests together with GREEN implementation under mandatory hooks. — GrumPHP runs Pest before each commit, so intentionally failing RED-only commits cannot pass without --no-verify, which is disallowed for this sequential execution.
+- [Phase 01-sync-contract-local-state]: Return canonical EntryPayload data for every accepted or skipped sync item. — This gives later frontend sync plans the server-canonical payload needed to rewrite local state safely.
+- [Phase 01-sync-contract-local-state]: Reject later duplicate validated entry dates before UpsertEntry. — This prevents one sync batch from overwriting the same day twice while keeping malformed item feedback item-scoped.
+- [Phase 01-sync-contract-local-state]: Keep mandatory hooks enabled for TDD plans. — RED behavior was verified, but RED-only commits are blocked by the required Pest pre-commit gate and --no-verify is disallowed.
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-25T01:47:18.098Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-04-25T01:57:24.508Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

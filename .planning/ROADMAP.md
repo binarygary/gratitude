@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
 Plans:
 - [x] 01-01-PLAN.md - Shared backend validation limits and canonical entry serializer.
-- [ ] 01-02-PLAN.md - Canonical batch sync response contract and conflict semantics.
+- [x] 01-02-PLAN.md - Canonical batch sync response contract and conflict semantics.
 - [ ] 01-03-PLAN.md - Frontend unit harness and Dexie explicit sync-state migration.
 - [ ] 01-04-PLAN.md - Result-aware local sync writes for synced, failed, rejected, and conflict outcomes.
 - [ ] 01-05-PLAN.md - User-visible sync statuses, recovery copy, restore-limit copy, and final gate.
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Sync Contract & Local State | 0/TBD | Not started | - |
+| 1. Sync Contract & Local State | 2/5 | In Progress | - |
 | 2. Auth & Session Hardening | 0/TBD | Not started | - |
 | 3. Observability & Health Signals | 0/TBD | Not started | - |
 | 4. Production Runbooks & Beta Gate | 0/TBD | Not started | - |
