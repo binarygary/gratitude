@@ -41,6 +41,7 @@
 - Pest v4.6.3 with `pestphp/pest-plugin-laravel` v4.1.0 - PHP tests in `tests/Feature/` and `tests/Unit/`.
 - PHPUnit 12.5.23 - underlying test runner configured by `phpunit.xml`.
 - Laravel test environment uses in-memory SQLite, array mailer/cache/session, and sync queue in `phpunit.xml`.
+- Vitest 4.1.5 with fake-indexeddb 6.2.5 - frontend unit tests for Dexie/IndexedDB local-state behavior in `resources/js/**/*.test.ts`, configured by `vitest.config.ts` and `tests/js/setup.ts`.
 
 **Build/Dev:**
 - Composer scripts in `composer.json`:
@@ -50,6 +51,7 @@
 - npm scripts in `package.json`:
   - `npm run dev` starts Vite.
   - `npm run build` builds frontend assets.
+  - `npm run test:unit` runs Vitest frontend unit tests.
   - `npm run typecheck` runs `tsc --noEmit`.
   - `npm run lint` runs ESLint against `resources/js`.
 - GrumPHP v2.20.0 coordinates quality checks in `grumphp.yml`.
@@ -65,6 +67,7 @@
 - `react` 19.2.5 and `react-dom` 19.2.5 - frontend UI runtime.
 - `dexie` 4.4.2 - IndexedDB wrapper for local-first journal entries in `resources/js/lib/db.ts`.
 - `axios` 1.15.2 - browser HTTP client configured in `resources/js/bootstrap.js` and used for entry upsert/sync in `resources/js/Pages/Today.tsx` and `resources/js/lib/db.ts`.
+- `vitest` 4.1.5 and `fake-indexeddb` 6.2.5 - Node-based frontend unit testing for IndexedDB-backed local state.
 - `symfony/postmark-mailer` v8.0.4 - Postmark mail transport support configured by `config/mail.php`.
 - `symfony/http-client` v8.0.8 - HTTP transport support for Symfony/Laravel mail integrations.
 
@@ -87,6 +90,7 @@
 
 **Build:**
 - `vite.config.js` defines Laravel/Vite inputs `resources/css/app.css` and `resources/js/app.tsx`, enables refresh, registers Tailwind, and ignores `storage/framework/views` for Vite watch.
+- `vitest.config.ts` runs frontend unit tests in Node, loads `tests/js/setup.ts`, and includes `resources/js/**/*.test.ts`.
 - `tsconfig.json` controls TypeScript checking for the frontend.
 - `eslint.config.js` controls frontend linting.
 - `phpunit.xml` controls PHP test suites and testing environment.

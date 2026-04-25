@@ -10,6 +10,9 @@
 - Config: `phpunit.xml`
 - Pest bootstrap: `tests/Pest.php`
 - Base test case: `tests/TestCase.php`
+- Vitest `^4.1` runs frontend unit tests, declared in `package.json`.
+- fake-indexeddb `^6.2` provides IndexedDB globals for Dexie tests through `tests/js/setup.ts`.
+- Frontend config: `vitest.config.ts`
 
 **Assertion Library:**
 - Laravel HTTP, session, auth, database, and console test assertions through `Tests\TestCase`, as used in `tests/Feature/EntryUpsertTest.php`, `tests/Feature/MagicLinkConsumeTest.php`, `tests/Feature/SettingsUpdateTest.php`, and `tests/Feature/MetricsCountsCommandTest.php`.
@@ -21,6 +24,8 @@ composer test                         # Clear config and run the full Laravel/Pe
 php artisan test                      # Run the full test suite directly
 php artisan test --filter=SyncPush    # Run a targeted test class or method while iterating
 XDEBUG_MODE=off vendor/bin/grumphp run # Final quality gate: typecheck, ESLint, PHPStan, Pint, Pest
+npm run test:unit -- resources/js/lib/db.test.ts # Focused frontend IndexedDB tests
+npm run test:unit                    # Full frontend unit suite
 npm run typecheck                     # Frontend TypeScript check
 npm run lint                          # Frontend ESLint check
 ```
@@ -31,7 +36,7 @@ npm run lint                          # Frontend ESLint check
 - Feature tests live under `tests/Feature/`, such as `tests/Feature/TodayRouteTest.php`, `tests/Feature/SyncPushTest.php`, and `tests/Feature/MagicLinkConsumeTest.php`.
 - Unit tests live under `tests/Unit/`; the current unit suite contains `tests/Unit/ExampleTest.php`.
 - Shared test configuration lives in `tests/Pest.php` and `tests/TestCase.php`.
-- No JavaScript/TypeScript test runner or frontend test files are configured. There is no `vitest.config.*`, `jest.config.*`, or `playwright.config.*`; frontend verification is currently `npm run typecheck` and `npm run lint` from `package.json`.
+- Frontend unit tests live alongside source as `resources/js/**/*.test.ts`. `vitest.config.ts` includes those tests and loads `tests/js/setup.ts`.
 
 **Naming:**
 - Use `*Test.php` filenames, grouped by feature or route: `EntryUpsertTest.php`, `SyncPushTest.php`, `SettingsUpdateTest.php`, `HistoryEntryRouteTest.php`, and `MetricsCountsCommandTest.php`.
@@ -52,6 +57,13 @@ tests/
 │   └── ExampleTest.php
 ├── Pest.php
 └── TestCase.php
+
+resources/js/
+└── lib/
+    └── db.test.ts
+
+tests/js/
+└── setup.ts
 ```
 
 ## Test Structure
@@ -174,6 +186,7 @@ Coverage output requires an enabled PHP coverage driver. The repository does not
 **Unit Tests:**
 - Scope: isolated pure logic or small units under `tests/Unit/`.
 - Current state: only `tests/Unit/ExampleTest.php` exists, so most meaningful coverage is feature-level.
+- Frontend unit scope: Dexie local-state behavior in `resources/js/lib/db.test.ts`, using Vitest and fake-indexeddb.
 
 **Integration Tests:**
 - Scope: Laravel route, validation, auth, persistence, Inertia response, and console command behavior through the framework.
@@ -184,8 +197,8 @@ Coverage output requires an enabled PHP coverage driver. The repository does not
 - Console command tests live in `tests/Feature/MetricsCountsCommandTest.php`.
 
 **E2E Tests:**
-- Not used. No Playwright, Cypress, Dusk, Jest, or Vitest test configuration is present.
-- Browser-facing React behavior in `resources/js/Pages/Today.tsx`, `resources/js/Components/AppShell.tsx`, `resources/js/lib/db.ts`, and `resources/js/lib/export.ts` has no automated runtime tests in the repository.
+- Not used. No Playwright, Cypress, or Dusk test configuration is present.
+- Browser-facing React behavior in `resources/js/Pages/Today.tsx`, `resources/js/Components/AppShell.tsx`, and `resources/js/lib/export.ts` still has no automated browser/runtime tests. Local IndexedDB primitives in `resources/js/lib/db.ts` are covered by Vitest.
 
 ## Common Patterns
 

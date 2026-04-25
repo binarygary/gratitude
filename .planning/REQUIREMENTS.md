@@ -9,10 +9,10 @@ Requirements for the beta-readiness milestone. Each maps to roadmap phases.
 
 ### Sync Reliability
 
-- [ ] **SYNC-01**: User can see whether a local entry is saved locally, pending sync, synced, failed, rejected, or in conflict.
+- [x] **SYNC-01**: User can see whether a local entry is saved locally, pending sync, synced, failed, rejected, or in conflict.
 - [x] **SYNC-02**: Server returns a canonical entry payload for each accepted or skipped sync item.
 - [ ] **SYNC-03**: Client stores canonical server data after sync so local state does not silently diverge.
-- [ ] **SYNC-04**: Rejected sync entries stop retrying indefinitely and show a recoverable user-facing state.
+- [x] **SYNC-04**: Rejected sync entries stop retrying indefinitely and show a recoverable user-facing state.
 - [x] **SYNC-05**: Sync API rejects oversized batches and oversized entry fields with clear per-item or request-level errors.
 - [x] **SYNC-06**: Direct entry save and batch sync use one shared server-side entry validation contract.
 - [x] **SYNC-07**: Conflict handling is defined and covered for server-newer, client-newer, duplicate, and clock-skew scenarios.
@@ -119,10 +119,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SYNC-01 | Phase 1 | Pending |
+| SYNC-01 | Phase 1 | Complete |
 | SYNC-02 | Phase 1 | Complete |
 | SYNC-03 | Phase 1 | Pending |
-| SYNC-04 | Phase 1 | Pending |
+| SYNC-04 | Phase 1 | Complete |
 | SYNC-05 | Phase 1 | Complete |
 | SYNC-06 | Phase 1 | Complete |
 | SYNC-07 | Phase 1 | Complete |
