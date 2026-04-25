@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Beta UI and documentation accurately state restore limits unless a verified pull/restore flow exists.
 **Plans**: 5 plans
 Plans:
-- [ ] 01-01-PLAN.md - Shared backend validation limits and canonical entry serializer.
+- [x] 01-01-PLAN.md - Shared backend validation limits and canonical entry serializer.
 - [ ] 01-02-PLAN.md - Canonical batch sync response contract and conflict semantics.
 - [ ] 01-03-PLAN.md - Frontend unit harness and Dexie explicit sync-state migration.
 - [ ] 01-04-PLAN.md - Result-aware local sync writes for synced, failed, rejected, and conflict outcomes.
