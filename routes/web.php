@@ -7,11 +7,24 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HistoryEntryController;
 use App\Http\Controllers\PoliciesController;
+use App\Http\Controllers\RootRedirectController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TodayController;
+use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-Route::redirect('/', '/today');
+Route::get('/', RootRedirectController::class)
+    ->withoutMiddleware([
+        AddQueuedCookiesToResponse::class,
+        HandleInertiaRequests::class,
+        PreventRequestForgery::class,
+        ShareErrorsFromSession::class,
+        StartSession::class,
+    ]);
 
 Route::get('/today', [TodayController::class, 'show'])->name('today.show');
 Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
