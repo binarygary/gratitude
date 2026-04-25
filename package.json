@@ -9,6 +9,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
+        "test:unit": "vitest run",
         "typecheck": "tsc --noEmit",
         "lint": "eslint resources/js --max-warnings=0"
     },
@@ -21,12 +22,14 @@
         "concurrently": "^9.0.1",
         "eslint": "^9.39.4",
         "eslint-plugin-react-hooks": "^7.0.1",
+        "fake-indexeddb": "^6.2.5",
         "globals": "^17.4.0",
         "laravel-vite-plugin": "^3.0.0",
         "tailwindcss": "^4.2.2",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.57.1",
-        "vite": "^8.0.1"
+        "vite": "^8.0.1",
+        "vitest": "^4.1.5"
     },
     "optionalDependencies": {
         "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.10",
