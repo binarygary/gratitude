@@ -119,40 +119,24 @@ export default function EntrySyncStatus({
     })();
 
     if (mode === 'alert') {
-        if (status === 'rejected' || status === 'conflict') {
-            return (
-                <div
-                    className={classNames(config.alertClassName, 'items-start rounded-xl py-3 text-sm')}
-                    role="alert"
-                >
-                    <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="space-y-1">
-                            <span className={classNames(config.badgeClassName, 'h-auto min-h-6 whitespace-normal rounded-lg text-left leading-snug')}>
-                                {copy}
-                            </span>
-                            {errorText && <p className="text-sm text-base-content/70">{errorText}</p>}
-                        </div>
-                        {action}
-                    </div>
-                </div>
-            );
-        }
+        const isAssertiveAlert = status === 'rejected' || status === 'conflict';
 
         return (
-            <div
-                className={classNames(config.alertClassName, 'items-start rounded-xl py-3 text-sm')}
-                role="status"
-                aria-live="polite"
-            >
-                <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                <div
+                    className={classNames(config.alertClassName, 'min-w-0 flex-1 items-start rounded-xl py-3 text-sm')}
+                    role={isAssertiveAlert ? 'alert' : 'status'}
+                    aria-live={isAssertiveAlert ? undefined : 'polite'}
+                >
                     <div className="space-y-1">
                         <span className={classNames(config.badgeClassName, 'h-auto min-h-6 whitespace-normal rounded-lg text-left leading-snug')}>
                             {copy}
                         </span>
                         {errorText && <p className="text-sm text-base-content/70">{errorText}</p>}
                     </div>
-                    {action}
                 </div>
+
+                {action && <div className="flex shrink-0 justify-start">{action}</div>}
             </div>
         );
     }
