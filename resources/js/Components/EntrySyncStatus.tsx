@@ -11,6 +11,9 @@ type Props = {
     onRetry?: () => void;
     onEdit?: () => void;
     onReviewLocalCopy?: () => void;
+    retryLabel?: string;
+    editLabel?: string;
+    reviewLocalCopyLabel?: string;
 };
 
 type StatusConfig = {
@@ -65,6 +68,9 @@ export default function EntrySyncStatus({
     onRetry,
     onEdit,
     onReviewLocalCopy,
+    retryLabel = 'Retry sync',
+    editLabel = 'Edit entry',
+    reviewLocalCopyLabel = 'Review local copy',
 }: Props) {
     const config = STATUS_CONFIG[status];
     const copy = isSyncing ? 'Syncing entry.' : config.copy;
@@ -78,7 +84,7 @@ export default function EntrySyncStatus({
                     disabled={actionDisabled}
                     onClick={onRetry}
                 >
-                    Retry sync
+                    {retryLabel}
                 </button>
             );
         }
@@ -91,7 +97,7 @@ export default function EntrySyncStatus({
                     disabled={actionDisabled}
                     onClick={onEdit}
                 >
-                    Edit entry
+                    {editLabel}
                 </button>
             );
         }
@@ -104,7 +110,7 @@ export default function EntrySyncStatus({
                     disabled={actionDisabled}
                     onClick={onReviewLocalCopy}
                 >
-                    Review local copy
+                    {reviewLocalCopyLabel}
                 </button>
             );
         }
