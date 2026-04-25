@@ -14,7 +14,7 @@ Reviewability guidance: phase plans should prefer stacked, independently reviewa
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Sync Contract & Local State** - Make local/server entry state explicit, bounded, canonical, and recoverable.
+- [x] **Phase 1: Sync Contract & Local State** - Make local/server entry state explicit, bounded, canonical, and recoverable.
 - [ ] **Phase 2: Auth & Session Hardening** - Protect magic-link auth and session-backed writes for public beta traffic.
 - [ ] **Phase 3: Observability & Health Signals** - Capture beta-critical errors, flow events, and queue/scheduler health without private content.
 - [ ] **Phase 4: Production Runbooks & Beta Gate** - Document and verify deploy, mail, backup, restore, rollback, and go/no-go operations.
@@ -41,7 +41,7 @@ Plans:
 - [x] 01-02-PLAN.md - Canonical batch sync response contract and conflict semantics.
 - [x] 01-03-PLAN.md - Frontend unit harness and Dexie explicit sync-state migration.
 - [x] 01-04-PLAN.md - Result-aware local sync writes for synced, failed, rejected, and conflict outcomes.
-- [ ] 01-05-PLAN.md - User-visible sync statuses, recovery copy, restore-limit copy, and final gate.
+- [x] 01-05-PLAN.md - User-visible sync statuses, recovery copy, restore-limit copy, and final gate.
 **UI hint**: yes
 
 ### Phase 2: Auth & Session Hardening
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Sync Contract & Local State | 4/5 | In Progress | - |
+| 1. Sync Contract & Local State | 5/5 | Complete | 2026-04-25 |
 | 2. Auth & Session Hardening | 0/TBD | Not started | - |
 | 3. Observability & Health Signals | 0/TBD | Not started | - |
 | 4. Production Runbooks & Beta Gate | 0/TBD | Not started | - |

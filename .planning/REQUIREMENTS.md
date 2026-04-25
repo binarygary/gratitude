@@ -16,7 +16,7 @@ Requirements for the beta-readiness milestone. Each maps to roadmap phases.
 - [x] **SYNC-05**: Sync API rejects oversized batches and oversized entry fields with clear per-item or request-level errors.
 - [x] **SYNC-06**: Direct entry save and batch sync use one shared server-side entry validation contract.
 - [x] **SYNC-07**: Conflict handling is defined and covered for server-newer, client-newer, duplicate, and clock-skew scenarios.
-- [ ] **SYNC-08**: Beta documentation and UI do not promise full fresh-device restore unless a restore/pull flow is implemented and verified.
+- [x] **SYNC-08**: Beta documentation and UI do not promise full fresh-device restore unless a restore/pull flow is implemented and verified.
 
 ### Authentication & Abuse Protection
 
@@ -126,7 +126,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-05 | Phase 1 | Complete |
 | SYNC-06 | Phase 1 | Complete |
 | SYNC-07 | Phase 1 | Complete |
-| SYNC-08 | Phase 1 | Pending |
+| SYNC-08 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
