@@ -1,8 +1,16 @@
 import Dexie from 'dexie';
+import axios from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { LocalEntry, SyncStatus } from './db';
+import type { CanonicalEntryPayload, LocalEntry, SyncErrorPayload, SyncStatus } from './db';
+
+vi.mock('axios', () => ({
+    default: {
+        post: vi.fn(),
+    },
+}));
 
 const databaseName = 'gratitude_journal';
+const mockedAxiosPost = vi.mocked(axios.post);
 
 type DbModule = typeof import('./db');
 
@@ -18,6 +26,25 @@ type LegacyEntry = {
 };
 
 let currentModule: DbModule | null = null;
+
+function installLocalStorage(): void {
+    const items = new Map<string, string>();
+    const storage: Storage = {
+        get length() {
+            return items.size;
+        },
+        clear: () => items.clear(),
+        getItem: (key: string) => items.get(key) ?? null,
+        key: (index: number) => Array.from(items.keys())[index] ?? null,
+        removeItem: (key: string) => items.delete(key),
+        setItem: (key: string, value: string) => items.set(key, value),
+    };
+
+    Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: storage,
+    });
+}
 
 function deleteDatabase(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -56,9 +83,41 @@ function makeEntry(syncStatus: SyncStatus, offset: number): LocalEntry {
     };
 }
 
+function makeLocalEntry(overrides: Partial<LocalEntry> = {}): LocalEntry {
+    return {
+        local_id: 'entry-local',
+        entry_date: '2026-04-10',
+        person: 'Local person',
+        grace: 'Local grace',
+        gratitude: 'Local gratitude',
+        updated_at: 100,
+        synced_at: null,
+        server_entry_date: null,
+        sync_status: 'local',
+        sync_error: null,
+        server_payload: null,
+        conflict_local_payload: null,
+        last_sync_attempt_at: null,
+        ...overrides,
+    };
+}
+
+function makeCanonicalEntry(overrides: Partial<CanonicalEntryPayload> = {}): CanonicalEntryPayload {
+    return {
+        entry_date: '2026-04-10',
+        person: 'Server person',
+        grace: 'Server grace',
+        gratitude: 'Server gratitude',
+        updated_at: 200,
+        ...overrides,
+    };
+}
+
 describe('local gratitude IndexedDB sync state', () => {
     beforeEach(async () => {
         vi.resetModules();
+        mockedAxiosPost.mockReset();
+        installLocalStorage();
         await deleteDatabase();
         currentModule = null;
     });
@@ -179,5 +238,208 @@ describe('local gratitude IndexedDB sync state', () => {
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('synced');
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('rejected');
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('conflict');
+    });
+
+    it('applySyncResult_stores_canonical_upserted_entries', async () => {
+        const { applySyncResult, db, getEntryByDate } = await importFreshDb();
+        const local = makeLocalEntry({
+            sync_error: 'Previous failure',
+            server_payload: makeCanonicalEntry({ person: 'Old server person', updated_at: 50 }),
+            conflict_local_payload: makeCanonicalEntry({ person: 'Old conflict person', updated_at: 60 }),
+        });
+        const canonical = makeCanonicalEntry();
+
+        await db.entries.put(local);
+
+        const updated = await applySyncResult(
+            local,
+            { entry_date: canonical.entry_date, status: 'upserted', entry: canonical },
+            1234,
+        );
+        const stored = await getEntryByDate(canonical.entry_date);
+
+        expect(updated).toMatchObject({
+            entry_date: canonical.entry_date,
+            person: canonical.person,
+            grace: canonical.grace,
+            gratitude: canonical.gratitude,
+            updated_at: canonical.updated_at,
+            synced_at: 1234,
+            server_entry_date: canonical.entry_date,
+            sync_status: 'synced',
+            sync_error: null,
+            server_payload: canonical,
+            conflict_local_payload: null,
+        });
+        expect(stored).toMatchObject(updated);
+    });
+
+    it('applySyncResult_marks_identical_skipped_entries_synced', async () => {
+        const { applySyncResult, db, getEntryByDate } = await importFreshDb();
+        const canonical = makeCanonicalEntry({
+            person: 'Same person',
+            grace: 'Same grace',
+            gratitude: 'Same gratitude',
+        });
+        const local = makeLocalEntry({
+            person: canonical.person ?? '',
+            grace: canonical.grace ?? '',
+            gratitude: canonical.gratitude ?? '',
+            updated_at: canonical.updated_at,
+            sync_status: 'failed',
+            sync_error: 'Sync request failed. Try again.',
+        });
+
+        await db.entries.put(local);
+
+        await applySyncResult(
+            local,
+            { entry_date: canonical.entry_date, status: 'skipped', entry: canonical },
+            2345,
+        );
+        const stored = await getEntryByDate(canonical.entry_date);
+
+        expect(stored).toMatchObject({
+            person: canonical.person,
+            grace: canonical.grace,
+            gratitude: canonical.gratitude,
+            updated_at: canonical.updated_at,
+            synced_at: 2345,
+            server_entry_date: canonical.entry_date,
+            sync_status: 'synced',
+            sync_error: null,
+            server_payload: canonical,
+            conflict_local_payload: null,
+        });
+    });
+
+    it('applySyncResult_preserves_local_copy_for_server_newer_conflicts', async () => {
+        const { applySyncResult, db, getEntryByDate, listUnsyncedEntries } = await importFreshDb();
+        const local = makeLocalEntry({
+            entry_date: '2026-04-11',
+            person: 'Losing local person',
+            grace: 'Losing local grace',
+            gratitude: 'Losing local gratitude',
+            updated_at: 300,
+        });
+        const canonical = makeCanonicalEntry({
+            entry_date: '2026-04-11',
+            person: 'Winning server person',
+            grace: 'Winning server grace',
+            gratitude: 'Winning server gratitude',
+            updated_at: 400,
+        });
+
+        await db.entries.put(local);
+
+        await applySyncResult(
+            local,
+            { entry_date: canonical.entry_date, status: 'skipped', entry: canonical },
+            3456,
+        );
+        const stored = await getEntryByDate(canonical.entry_date);
+        const retryable = await listUnsyncedEntries();
+
+        expect(stored).toMatchObject({
+            person: canonical.person,
+            grace: canonical.grace,
+            gratitude: canonical.gratitude,
+            updated_at: canonical.updated_at,
+            synced_at: 3456,
+            server_entry_date: canonical.entry_date,
+            sync_status: 'conflict',
+            sync_error: null,
+            server_payload: canonical,
+            conflict_local_payload: {
+                entry_date: local.entry_date,
+                person: local.person,
+                grace: local.grace,
+                gratitude: local.gratitude,
+                updated_at: local.updated_at,
+            },
+        });
+        expect(retryable).toHaveLength(0);
+    });
+
+    it('applySyncResult_marks_rejected_entries_non_retryable', async () => {
+        const { applySyncResult, db, getEntryByDate, listUnsyncedEntries } = await importFreshDb();
+        const local = makeLocalEntry({
+            entry_date: '2026-04-12',
+            person: 'Invalid local person',
+            grace: 'Invalid local grace',
+            gratitude: 'Invalid local gratitude',
+            updated_at: 500,
+        });
+        const errors: SyncErrorPayload = {
+            person: ['The person field must not be greater than 5000 characters.'],
+        };
+
+        await db.entries.put(local);
+
+        await applySyncResult(local, { entry_date: local.entry_date, status: 'rejected', errors }, 4567);
+        const stored = await getEntryByDate(local.entry_date);
+        const retryable = await listUnsyncedEntries();
+
+        expect(stored).toMatchObject({
+            person: local.person,
+            grace: local.grace,
+            gratitude: local.gratitude,
+            updated_at: local.updated_at,
+            synced_at: null,
+            sync_status: 'rejected',
+            sync_error: errors,
+            server_payload: null,
+            conflict_local_payload: null,
+            last_sync_attempt_at: 4567,
+        });
+        expect(retryable).toHaveLength(0);
+    });
+
+    it('pushUnsyncedEntries_marks_attempted_entries_failed_when_the_request_fails', async () => {
+        const { db, getEntryByDate, listUnsyncedEntries, pushUnsyncedEntries } = await importFreshDb();
+        const local = makeLocalEntry({
+            entry_date: '2026-04-13',
+            person: 'Private local person',
+            grace: 'Private local grace',
+            gratitude: 'Private local gratitude',
+        });
+        const alreadyFailed = makeLocalEntry({
+            local_id: 'entry-failed',
+            entry_date: '2026-04-14',
+            sync_status: 'failed',
+            sync_error: 'Previous request failed.',
+        });
+
+        await db.entries.bulkPut([local, alreadyFailed]);
+        mockedAxiosPost.mockRejectedValueOnce(new Error('network down'));
+
+        await expect(pushUnsyncedEntries()).rejects.toThrow('network down');
+
+        const failedLocal = await getEntryByDate(local.entry_date);
+        const failedRetry = await getEntryByDate(alreadyFailed.entry_date);
+        const retryable = await listUnsyncedEntries();
+
+        expect(mockedAxiosPost).toHaveBeenCalledWith('/api/sync/push', {
+            device_id: expect.any(String),
+            entries: expect.arrayContaining([
+                expect.objectContaining({ entry_date: local.entry_date }),
+                expect.objectContaining({ entry_date: alreadyFailed.entry_date }),
+            ]),
+        });
+        expect(failedLocal).toMatchObject({
+            sync_status: 'failed',
+            sync_error: 'Sync request failed. Try again.',
+        });
+        expect(failedRetry).toMatchObject({
+            sync_status: 'failed',
+            sync_error: 'Sync request failed. Try again.',
+        });
+        expect(String(failedLocal?.sync_error)).not.toContain('Private local person');
+        expect(failedLocal?.last_sync_attempt_at).toEqual(expect.any(Number));
+        expect(failedRetry?.last_sync_attempt_at).toEqual(expect.any(Number));
+        expect(retryable.map((entry) => entry.entry_date).sort()).toEqual([
+            alreadyFailed.entry_date,
+            local.entry_date,
+        ].sort());
     });
 });
