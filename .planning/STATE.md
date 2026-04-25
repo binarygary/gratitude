@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-04-25T02:09:19.456Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-04-25T02:21:25.914Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,35 +26,36 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 01 (sync-contract-local-state) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-25
 
-Progress: [######----] 60%
+Progress: [########--] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 6 min
-- Total execution time: 0.3 hours
+- Total execution time: 0.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-sync-contract-local-state | 3 | 17 min | 6 min |
+| 01-sync-contract-local-state | 4 | 24 min | 6 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 6 min, 5 min, 6 min
+- Last 5 plans: 6 min, 5 min, 6 min, 7 min
 - Trend: Stable
 
 *Updated after each plan completion*
 | Phase 01-sync-contract-local-state P01 | 6 min | 2 tasks | 7 files |
 | Phase 01-sync-contract-local-state P02 | 5 min | 2 tasks | 2 files |
 | Phase 01-sync-contract-local-state P03 | 6 min | 3 tasks | 8 files |
+| Phase 01-sync-contract-local-state P04 | 7 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 01-sync-contract-local-state]: Use Vitest with fake-indexeddb for deterministic Dexie local-state tests without browser automation. — Plan 03 needed fast unit coverage for IndexedDB migration and retry selection while broader browser flows remain later-phase scope.
 - [Phase 01-sync-contract-local-state]: Derive legacy local sync status from synced_at during the Dexie version 2 migration. — Rows with synced_at become synced and rows with null or missing synced_at become local, preserving prompt text and avoiding destructive IndexedDB resets.
 - [Phase 01-sync-contract-local-state]: Automatic retry selection is status-based and limited to local and failed entries. — Pending, synced, rejected, and conflict entries are durable non-retryable states until a later explicit transition changes them.
+- [Phase 01-sync-contract-local-state]: Use applySyncResult as the single browser-side transition point for canonical sync results.
+- [Phase 01-sync-contract-local-state]: Store server canonical fields as primary for skipped conflicts while preserving the losing local fields in conflict_local_payload.
+- [Phase 01-sync-contract-local-state]: Keep request-level sync failure metadata generic and retryable without copying prompt text into error strings.
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-25T02:09:19.453Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-04-25T02:21:25.910Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
