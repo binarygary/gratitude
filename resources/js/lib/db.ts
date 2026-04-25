@@ -13,6 +13,20 @@ export type CanonicalEntryPayload = {
 
 export type SyncErrorPayload = Record<string, string[]> | string;
 
+export const SYNC_BATCH_SIZE = 50;
+
+export type SyncPushResult =
+    | { entry_date: string; status: 'upserted' | 'skipped'; entry: CanonicalEntryPayload }
+    | { entry_date: string | null; status: 'rejected'; errors: SyncErrorPayload };
+
+export type PushUnsyncedEntriesResult = {
+    attempted: number;
+    synced: number;
+    rejected: number;
+    conflict: number;
+    failed: number;
+};
+
 export type LocalEntry = {
     local_id: string;
     entry_date: string;
@@ -137,6 +151,133 @@ export async function listUnsyncedEntries(): Promise<LocalEntry[]> {
 
         return entry.sync_status === 'local' || entry.sync_status === 'failed';
     }).toArray();
+}
+
+function canonicalText(value: string | null): string {
+    return value ?? '';
+}
+
+function promptsMatchCanonical(local: LocalEntry, canonical: CanonicalEntryPayload): boolean {
+    return local.person === canonicalText(canonical.person)
+        && local.grace === canonicalText(canonical.grace)
+        && local.gratitude === canonicalText(canonical.gratitude);
+}
+
+function conflictPayloadFrom(local: LocalEntry): CanonicalEntryPayload {
+    return {
+        entry_date: local.entry_date,
+        person: local.person,
+        grace: local.grace,
+        gratitude: local.gratitude,
+        updated_at: local.updated_at,
+    };
+}
+
+function syncPayloadFrom(entry: LocalEntry): Pick<
+    LocalEntry,
+    'entry_date' | 'person' | 'grace' | 'gratitude' | 'updated_at'
+> {
+    return {
+        entry_date: entry.entry_date,
+        person: entry.person,
+        grace: entry.grace,
+        gratitude: entry.gratitude,
+        updated_at: entry.updated_at,
+    };
+}
+
+function chunkEntries(entries: LocalEntry[]): LocalEntry[][] {
+    const chunks: LocalEntry[][] = [];
+
+    for (let index = 0; index < entries.length; index += SYNC_BATCH_SIZE) {
+        chunks.push(entries.slice(index, index + SYNC_BATCH_SIZE));
+    }
+
+    return chunks;
+}
+
+export async function markEntriesPending(entries: LocalEntry[], attemptedAt = Date.now()): Promise<LocalEntry[]> {
+    const pendingEntries: LocalEntry[] = [];
+
+    for (const entry of entries) {
+        const current = await db.entries.get(entry.local_id) ?? entry;
+        const pendingEntry: LocalEntry = {
+            ...current,
+            sync_status: 'pending',
+            sync_error: null,
+            last_sync_attempt_at: attemptedAt,
+        };
+
+        await db.entries.put(pendingEntry);
+        pendingEntries.push(pendingEntry);
+    }
+
+    return pendingEntries;
+}
+
+export async function markEntriesFailed(entries: LocalEntry[], attemptedAt = Date.now()): Promise<LocalEntry[]> {
+    const failedEntries: LocalEntry[] = [];
+
+    for (const entry of entries) {
+        const current = await db.entries.get(entry.local_id) ?? entry;
+        const failedEntry: LocalEntry = {
+            ...current,
+            sync_status: 'failed',
+            sync_error: 'Sync request failed. Try again.',
+            last_sync_attempt_at: attemptedAt,
+        };
+
+        await db.entries.put(failedEntry);
+        failedEntries.push(failedEntry);
+    }
+
+    return failedEntries;
+}
+
+export async function applySyncResult(
+    local: LocalEntry,
+    result: SyncPushResult,
+    syncedAt = Date.now(),
+): Promise<LocalEntry> {
+    const current = await db.entries.get(local.local_id) ?? local;
+
+    if (result.status === 'rejected') {
+        const rejectedEntry: LocalEntry = {
+            ...current,
+            synced_at: null,
+            sync_status: 'rejected',
+            sync_error: result.errors,
+            server_payload: null,
+            conflict_local_payload: null,
+            last_sync_attempt_at: syncedAt,
+        };
+
+        await db.entries.put(rejectedEntry);
+
+        return rejectedEntry;
+    }
+
+    const canonical = result.entry;
+    const isConflict = result.status === 'skipped' && !promptsMatchCanonical(local, canonical);
+    const updatedEntry: LocalEntry = {
+        ...current,
+        entry_date: canonical.entry_date,
+        person: canonicalText(canonical.person),
+        grace: canonicalText(canonical.grace),
+        gratitude: canonicalText(canonical.gratitude),
+        updated_at: canonical.updated_at,
+        synced_at: syncedAt,
+        server_entry_date: canonical.entry_date,
+        sync_status: isConflict ? 'conflict' : 'synced',
+        sync_error: null,
+        server_payload: canonical,
+        conflict_local_payload: isConflict ? conflictPayloadFrom(local) : null,
+        last_sync_attempt_at: syncedAt,
+    };
+
+    await db.entries.put(updatedEntry);
+
+    return updatedEntry;
 }
 
 type SeedLocalEntriesOptions = {
@@ -270,37 +411,71 @@ export async function markEntriesSynced(entryDates: string[]): Promise<void> {
             continue;
         }
 
-        await db.entries.put({
-            ...entry,
-            synced_at: syncedAt,
-            server_entry_date: entry.entry_date,
-            sync_status: 'synced',
-            sync_error: null,
-            last_sync_attempt_at: null,
-        });
+        await applySyncResult(entry, {
+            entry_date: entry.entry_date,
+            status: 'upserted',
+            entry: conflictPayloadFrom(entry),
+        }, syncedAt);
     }
 }
 
-export async function pushUnsyncedEntries(): Promise<void> {
+export async function pushUnsyncedEntries(): Promise<PushUnsyncedEntriesResult> {
     const unsynced = await listUnsyncedEntries();
+    const summary: PushUnsyncedEntriesResult = {
+        attempted: unsynced.length,
+        synced: 0,
+        rejected: 0,
+        conflict: 0,
+        failed: 0,
+    };
+
     if (unsynced.length === 0) {
-        return;
+        return summary;
     }
 
-    const response = await axios.post('/api/sync/push', {
-        device_id: getDeviceId(),
-        entries: unsynced.map((entry) => ({
-            entry_date: entry.entry_date,
-            person: entry.person,
-            grace: entry.grace,
-            gratitude: entry.gratitude,
-            updated_at: entry.updated_at,
-        })),
-    });
+    for (const chunk of chunkEntries(unsynced)) {
+        const attemptedAt = Date.now();
+        const pendingEntries = await markEntriesPending(chunk, attemptedAt);
 
-    const successfulEntryDates: string[] = (response.data?.results ?? [])
-        .filter((item: { status: string }) => item.status === 'upserted' || item.status === 'skipped')
-        .map((item: { entry_date: string }) => item.entry_date);
+        try {
+            const response = await axios.post('/api/sync/push', {
+                device_id: getDeviceId(),
+                entries: pendingEntries.map(syncPayloadFrom),
+            });
+            const results = (response.data?.results ?? []) as SyncPushResult[];
+            const pendingByDate = new Map(pendingEntries.map((entry) => [entry.entry_date, entry]));
+            const handledLocalIds = new Set<string>();
 
-    await markEntriesSynced(successfulEntryDates);
+            for (const [index, result] of results.entries()) {
+                const local = result.entry_date ? pendingByDate.get(result.entry_date) : pendingEntries[index];
+
+                if (!local) {
+                    continue;
+                }
+
+                const updated = await applySyncResult(local, result, attemptedAt);
+                handledLocalIds.add(local.local_id);
+
+                if (result.status === 'rejected') {
+                    summary.rejected++;
+                } else if (updated.sync_status === 'conflict') {
+                    summary.conflict++;
+                } else {
+                    summary.synced++;
+                }
+            }
+
+            const unhandledEntries = pendingEntries.filter((entry) => !handledLocalIds.has(entry.local_id));
+            if (unhandledEntries.length > 0) {
+                await markEntriesFailed(unhandledEntries, attemptedAt);
+                summary.failed += unhandledEntries.length;
+            }
+        } catch (error) {
+            await markEntriesFailed(pendingEntries, attemptedAt);
+            summary.failed += pendingEntries.length;
+            throw error;
+        }
+    }
+
+    return summary;
 }
