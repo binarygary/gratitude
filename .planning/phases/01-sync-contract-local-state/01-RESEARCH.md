@@ -456,22 +456,22 @@ fake-indexeddb documents importing `fake-indexeddb/auto` before Dexie so Dexie c
 | A3 | Vitest + fake-indexeddb is enough for Phase 1 local-state verification, with broader browser E2E deferred to Phase 8. | Standard Stack / Validation Architecture | If UI behavior is complex or browser-only APIs matter, Phase 1 needs Playwright earlier. |
 | A4 | No collaborative editing or CRDT-style merging is needed for one daily private entry. | Don't Hand-Roll / State of the Art | If multi-device simultaneous editing becomes a hard requirement, bounded LWW may not be enough. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What exact size limits should the product accept?**
+1. **What exact size and clock-skew limits should the product accept? (RESOLVED)**
    - What we know: Current prompt fields and batch size are unbounded at app validation level. [VERIFIED: EntryController; SyncController]
-   - What's unclear: The right beta limits for prompt text length and sync batch count. [ASSUMED]
-   - Recommendation: Start conservatively, for example 5,000 characters per prompt and 50 entries per batch, then adjust before planning locks the contract. [ASSUMED]
+   - Resolution: Phase 1 plans lock 5,000 characters per prompt, 50 entries per sync batch, and a 15-minute future timestamp skew bound (`MAX_FUTURE_SKEW_MILLISECONDS = 900000`). [PLANNED: 01-01-PLAN.md]
+   - Recommendation applied: Use `MAX_PROMPT_LENGTH = 5000`, `MAX_BATCH_ENTRIES = 50`, and reject `updated_at` values more than 15 minutes in the future. [PLANNED: 01-01-PLAN.md]
 
-2. **Should server-newer conflicts overwrite the displayed local draft immediately?**
+2. **Should server-newer conflicts overwrite the displayed local draft immediately? (RESOLVED)**
    - What we know: SYNC-03 requires canonical server data to be stored after accepted/skipped sync items. [VERIFIED: .planning/REQUIREMENTS.md]
-   - What's unclear: Whether users should see server text first with a recovery action or a blocking conflict chooser before replacement. [ASSUMED]
-   - Recommendation: Store canonical fields as primary, preserve the local losing payload in conflict metadata, and show a single recovery action. [ASSUMED]
+   - Resolution: Store server-canonical fields as the primary local record, set `sync_status: 'conflict'` when the skipped server payload differs, and preserve the losing local text in `conflict_local_payload` for review. [PLANNED: 01-04-PLAN.md; 01-05-PLAN.md]
+   - Recommendation applied: Show the synced/server version first with a recovery action to review the preserved local copy. [PLANNED: 01-05-PLAN.md]
 
-3. **Should Phase 1 add server revision metadata?**
+3. **Should Phase 1 add server revision metadata? (RESOLVED)**
    - What we know: Current server conflict logic uses client-provided `updated_at`, and the entries table has no revision column. [VERIFIED: UpsertEntry; entries migration]
-   - What's unclear: Whether adding a revision column is worth the migration in Phase 1. [ASSUMED]
-   - Recommendation: Do not add a revision column unless planning finds clock-skew tests cannot be handled with bounded timestamp validation and canonical server responses. [ASSUMED]
+   - Resolution: Phase 1 does not add a server revision column or server data migration. Conflict coverage uses bounded timestamp validation, duplicate-date rejection, canonical sync responses, and local conflict metadata. [PLANNED: 01-01-PLAN.md; 01-02-PLAN.md; 01-04-PLAN.md]
+   - Recommendation applied: Keep the server schema unchanged for Phase 1. [PLANNED: 01-01-PLAN.md through 01-05-PLAN.md]
 
 ## Environment Availability
 
