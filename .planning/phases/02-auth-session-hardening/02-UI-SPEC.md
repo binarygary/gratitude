@@ -38,11 +38,13 @@ Required surfaces:
 | Signed-out navbar | Keep the current compact `Sign in` primary button. On small screens the existing mail icon-only button remains acceptable if it keeps `aria-label="Sign in"`. |
 | Sign-in menu | Use the existing absolute dropdown panel aligned to the right edge of the navbar. Width stays `w-72`; padding stays `p-4`; surface uses `rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm`. |
 | Email field | Keep label `Email`, `type="email"`, placeholder `you@example.com`, required validation, and full-width input. Validation errors may appear below the field in `text-sm text-error`. |
-| Turnstile widget | Place directly between the email field and submit button with `mt-3`. It must not push the menu wider than `w-72`; if the provider widget overflows, use compact rendering or scale within the dropdown. |
+| Turnstile widget | Place directly between the email field and submit button with `mt-4`. It must not push the menu wider than `w-72`; if the provider widget overflows, use compact rendering or scale within the dropdown. |
 | Request feedback | Use the existing global flash alert in `AppShell`: `alert alert-info`, `role="status"`, `aria-live="polite"`. Do not show different request success/failure text for accepted, throttled, unknown-email, or failed-verification cases. |
 | Invalid or expired link | Redirect to the Today surface with a global flash alert. Copy must tell the user to request a new link. Do not expose whether the email exists. |
 | Remember-device choice | If made visible, place a single checkbox row below Turnstile and above the submit button: label `Remember this device`. Helper copy must be one short sentence. If not visible, document the default in settings/help copy, not in the dropdown. |
 | Sign-out state | Keep account menu sign-out as a plain menu item. After sign-out, show global flash `Signed out.` |
+
+Visual hierarchy: the primary visual anchor is the compact `Sign in` button when signed out. Inside the dropdown, the email field leads to the `Send magic link` CTA, with Turnstile and remember-device controls visually subordinate to that path.
 
 Out of scope for this phase: passkeys, OAuth, password login, account deletion, fresh-device restore promises, broad friend-facing onboarding, admin/support UI, and notification preferences.
 
