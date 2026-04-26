@@ -23,6 +23,7 @@ Users can capture a daily gratitude reflection with confidence that it is saved,
 - ✓ User can configure timezone and flashback preferences in Settings — existing
 - ✓ Project can run locally with SQLite-first Laravel defaults and Vite-built React assets — existing
 - ✓ Quality tooling exists for PHP tests, PHPStan/Larastan, Pint, TypeScript, ESLint, frontend build, and GitHub Actions — existing
+- ✓ Local-first sync reliability now includes explicit sync states, canonical server payload storage, rejected-entry handling, safer conflict behavior, and user-visible recovery affordances — Phase 1
 
 ### Active
 
@@ -31,7 +32,6 @@ Users can capture a daily gratitude reflection with confidence that it is saved,
 - [ ] Build an internal admin MVP for beta operations: user lookup, status visibility, and basic support actions.
 - [ ] Harden magic-link authentication and abuse controls for beta, including Turnstile and session/token safeguards.
 - [ ] Strengthen production readiness with hosting/deploy documentation, email deliverability, backup/restore runbooks, and a beta go/no-go checklist.
-- [ ] Improve local-first sync reliability, including rejected-entry handling, user-visible sync status, and safer conflict behavior.
 - [ ] Expand test coverage for auth, sync, timezone-sensitive behavior, notifications, and frontend local-first workflows.
 - [ ] Improve friend-share onboarding, failure states, and privacy copy without starting broad marketing work.
 
@@ -83,6 +83,7 @@ Known concerns from the codebase map:
 | Focus the next milestone on friend-shareable beta readiness | `_planning/ROADMAP.md` and `_planning/BACKLOG.md` identify beta gates as the active product objective | — Pending |
 | Keep web-first, local-first capture as the product center | The core value depends on daily capture working quickly and reliably, even before sign-in | — Pending |
 | Reuse saved GSD defaults for workflow configuration | `~/.gsd/defaults.json` exists and matches a high-structure workflow with research, checks, verifier, and fine granularity | — Pending |
+| Complete sync hardening before auth hardening | Phase 1 established canonical sync responses, explicit browser sync states, recoverable rejected/conflict paths, and honest restore-limit copy before exposing the app to broader beta traffic | ✓ Good |
 
 ## Evolution
 
@@ -102,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-25 after initialization*
+*Last updated: 2026-04-26 after Phase 1*

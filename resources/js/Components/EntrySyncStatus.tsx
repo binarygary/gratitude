@@ -17,41 +17,55 @@ type Props = {
 };
 
 type StatusConfig = {
+    label: string;
     copy: string;
-    badgeClassName: string;
-    alertClassName: string;
+    dotClassName: string;
+    indicatorClassName: string;
+    calloutClassName: string;
 };
 
 const STATUS_CONFIG: Record<SyncStatus, StatusConfig> = {
     local: {
+        label: 'Local',
         copy: 'Saved on this device.',
-        badgeClassName: 'badge badge-ghost text-base-content/70',
-        alertClassName: 'alert border-base-300/50 bg-base-100 text-base-content',
+        dotClassName: 'bg-base-content/40',
+        indicatorClassName: 'border-base-300/70 bg-base-100 text-base-content/70',
+        calloutClassName: 'border-base-300/70 bg-base-100',
     },
     pending: {
+        label: 'Pending',
         copy: 'Waiting to sync when you are signed in and online.',
-        badgeClassName: 'badge badge-primary badge-outline',
-        alertClassName: 'alert alert-info',
+        dotClassName: 'bg-primary',
+        indicatorClassName: 'border-primary/30 bg-primary/5 text-primary',
+        calloutClassName: 'border-primary/30 bg-primary/5',
     },
     synced: {
+        label: 'Synced',
         copy: 'Synced backup is up to date.',
-        badgeClassName: 'badge badge-success badge-outline',
-        alertClassName: 'alert alert-success',
+        dotClassName: 'bg-primary',
+        indicatorClassName: 'border-primary/30 bg-primary/5 text-primary',
+        calloutClassName: 'border-primary/30 bg-primary/5',
     },
     failed: {
+        label: 'Failed',
         copy: 'This entry is saved on this device, but sync did not finish.',
-        badgeClassName: 'badge badge-warning badge-outline',
-        alertClassName: 'alert alert-warning',
+        dotClassName: 'bg-warning',
+        indicatorClassName: 'border-warning/40 bg-warning/10 text-base-content',
+        calloutClassName: 'border-warning/40 bg-warning/10',
     },
     rejected: {
+        label: 'Rejected',
         copy: 'This entry is saved on this device, but it needs changes before it can sync.',
-        badgeClassName: 'badge badge-error badge-outline',
-        alertClassName: 'alert alert-error',
+        dotClassName: 'bg-error',
+        indicatorClassName: 'border-error/30 bg-error/5 text-base-content',
+        calloutClassName: 'border-error/30 bg-error/5',
     },
     conflict: {
+        label: 'Conflict',
         copy: 'A newer synced version exists. The synced version is shown, and your local copy is preserved for review.',
-        badgeClassName: 'badge badge-warning badge-outline',
-        alertClassName: 'alert alert-warning',
+        dotClassName: 'bg-warning',
+        indicatorClassName: 'border-warning/40 bg-warning/10 text-base-content',
+        calloutClassName: 'border-warning/40 bg-warning/10',
     },
 };
 
@@ -74,6 +88,7 @@ export default function EntrySyncStatus({
 }: Props) {
     const config = STATUS_CONFIG[status];
     const copy = isSyncing ? 'Syncing entry.' : config.copy;
+    const label = isSyncing ? 'Syncing' : config.label;
     const actionDisabled = isBusy || isSyncing;
     const action = (() => {
         if (status === 'failed' && onRetry) {
@@ -93,7 +108,7 @@ export default function EntrySyncStatus({
             return (
                 <button
                     type="button"
-                    className="btn btn-error btn-sm min-w-28 rounded-xl"
+                    className="btn btn-primary btn-sm min-w-28 rounded-xl"
                     disabled={actionDisabled}
                     onClick={onEdit}
                 >
@@ -122,17 +137,22 @@ export default function EntrySyncStatus({
         const isAssertiveAlert = status === 'rejected' || status === 'conflict';
 
         return (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+            <div className="flex flex-col gap-2">
                 <div
-                    className={classNames(config.alertClassName, 'min-w-0 flex-1 items-start rounded-xl py-3 text-sm')}
+                    className={classNames(config.calloutClassName, 'min-w-0 rounded-xl border p-3 text-sm text-base-content')}
                     role={isAssertiveAlert ? 'alert' : 'status'}
                     aria-live={isAssertiveAlert ? undefined : 'polite'}
                 >
-                    <div className="space-y-1">
-                        <span className={classNames(config.badgeClassName, 'h-auto min-h-6 whitespace-normal rounded-lg text-left leading-snug')}>
-                            {copy}
-                        </span>
-                        {errorText && <p className="text-sm text-base-content/70">{errorText}</p>}
+                    <div className="flex items-start gap-2">
+                        <span
+                            className={classNames(config.dotClassName, 'mt-1.5 size-2.5 shrink-0 rounded-full')}
+                            aria-hidden="true"
+                        />
+                        <div className="min-w-0 space-y-1">
+                            <p className="font-medium leading-snug">{label}</p>
+                            <p className="leading-relaxed text-base-content/75">{copy}</p>
+                            {errorText && <p className="leading-relaxed text-base-content/70">{errorText}</p>}
+                        </div>
                     </div>
                 </div>
 
@@ -147,8 +167,19 @@ export default function EntrySyncStatus({
             role="status"
             aria-live="polite"
         >
-            <span className={classNames(config.badgeClassName, 'h-auto min-h-6 whitespace-normal rounded-lg text-left leading-snug')}>
-                {copy}
+            <span
+                className={classNames(
+                    config.indicatorClassName,
+                    'inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+                )}
+                aria-label={copy}
+                title={copy}
+            >
+                <span
+                    className={classNames(config.dotClassName, 'size-1.5 shrink-0 rounded-full')}
+                    aria-hidden="true"
+                />
+                <span>{label}</span>
             </span>
         </span>
     );

@@ -1,16 +1,16 @@
 ---
-status: partial
+status: passed
 phase: 01-sync-contract-local-state
 source: [01-VERIFICATION.md]
 started: 2026-04-25T02:47:54Z
-updated: 2026-04-25T11:46:33Z
+updated: 2026-04-26T00:57:17Z
 ---
 
 # Phase 1 Human UAT
 
 ## Current Test
 
-Status presentation redesign needed before UAT can pass.
+Human UAT passed after the status presentation redesign.
 
 ## Tests
 
@@ -18,23 +18,25 @@ Status presentation redesign needed before UAT can pass.
 
 expected: Today, History, and HistoryEntry visibly show local, pending, synced, failed, rejected, and conflict states with the right recovery actions.
 result: issue - current rejected/error presentation is too intrusive; the error copy is hard to read, vertically awkward inside the red block, and recovery actions feel disconnected from the message.
+retest: passed - compact dot/label statuses and restrained callouts accepted in human UAT.
 
 ### 2. Conflict Local-Copy Review and Discard
 
 expected: Conflict entries show server-canonical text, preserve the local copy in Review local copy, and require confirmation before discard.
-result: [pending]
+result: passed - conflict review and discard behavior accepted in human UAT.
 
 ### 3. Responsive and Assistive Behavior
 
 expected: Status badges and alerts remain readable on mobile/desktop and announce changes through the intended role/status/aria-live semantics.
 result: issue - status messaging needs a less intrusive visual model, and the History status column should use a simple brand-colored sync indicator instead of long visible status text.
+retest: passed - compact History status output and responsive presentation accepted in human UAT.
 
 ## Summary
 
 total: 3
-passed: 0
-issues: 2
-pending: 1
+passed: 3
+issues: 0
+pending: 0
 skipped: 0
 blocked: 0
 
@@ -42,7 +44,7 @@ blocked: 0
 
 ### GAP-01: Sync Status UI Is Too Intrusive
 
-status: failed
+status: resolved
 source: user UAT screenshot and feedback
 
 Problem:
@@ -51,15 +53,17 @@ Problem:
 - Recovery buttons beside the block feel unrelated to the message.
 - History needs compact scan-friendly status, not long explanatory text in a table cell.
 
-Next steps:
-1. Redesign `EntrySyncStatus` around compact visible labels:
-   - History/table mode: small brand-colored dot plus short label (`Local`, `Pending`, `Synced`, `Failed`, `Rejected`, `Conflict`).
-   - Inline mode: compact indicator for Today and HistoryEntry normal state.
-   - Alert/callout mode: restrained neutral/light notice for failed, rejected, and conflict, with action buttons below the message.
-2. Keep full explanatory copy available through accessible labels/titles and in callout body text only where action is needed.
-3. Add/update component tests so:
-   - History/compact mode does not render the long sentence copy visibly.
-   - Rejected callout does not use `alert-error` as a full-width red panel.
-   - Action buttons render below the callout message.
-4. Re-run `npm run test:unit -- resources/js/Components/EntrySyncStatus.test.ts`, `npm run typecheck`, `npm run lint`, and `npm run build`.
-5. Repeat UAT for History, Today, and HistoryEntry before marking Phase 1 complete.
+Resolution:
+- Human UAT passed after the compact status redesign.
+- Phase 1 can proceed through the completion flow.
+
+Implementation:
+- `EntrySyncStatus` uses compact visible labels (`Local`, `Pending`, `Synced`, `Failed`, `Rejected`, `Conflict`) with dot indicators for inline/table contexts.
+- Full explanatory copy remains available via accessible labels/titles for compact status and appears in callout body text where action is needed.
+- Failed, rejected, and conflict callouts use restrained light panels with action buttons below the message.
+
+Verification:
+- `npm run test:unit -- resources/js/Components/EntrySyncStatus.test.ts`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
