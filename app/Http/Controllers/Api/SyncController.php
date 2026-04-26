@@ -48,12 +48,12 @@ class SyncController extends Controller
 
             $seenEntryDates[$validatedEntry['entry_date']] = true;
             $result = $upsertEntry->execute($request->user(), $validatedEntry);
-            $entry = $result['entry'];
+            $savedEntry = $result['entry'];
 
             $results[] = [
                 'entry_date' => $validatedEntry['entry_date'],
                 'status' => $result['status'],
-                'entry' => EntryPayload::fromModel($entry),
+                'entry' => EntryPayload::fromModel($savedEntry),
             ];
         }
 
