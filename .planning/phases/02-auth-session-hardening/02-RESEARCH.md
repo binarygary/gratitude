@@ -364,22 +364,19 @@ The Blade shell already emits `<meta name="csrf-token" ...>`, while `resources/j
 | A3 | Rate-limit numeric thresholds should be modest beta defaults, not fixed by research. | Code Examples | Medium; planner should choose exact limits based on beta tolerance. |
 | A4 | Temporarily rebinding app environment or writing middleware-level tests is acceptable for CSRF posture tests. | Common Pitfalls / Validation | Medium; implementation should prove the test fails before removing exemptions. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact Turnstile mode and env names**
    - What we know: The phase locks Cloudflare Turnstile and local/test fake behavior. [VERIFIED: 02-CONTEXT.md]
-   - What's unclear: Final env variable names and whether local uses Cloudflare dummy keys or an app-level bypass. [ASSUMED]
-   - Recommendation: Use `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, and `TURNSTILE_ENABLED` or equivalent; bind a fake verifier in tests. [ASSUMED]
+   - Decision: Plans use `TURNSTILE_ENABLED`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_VERIFY_URL`, `TURNSTILE_TIMEOUT`, and `TURNSTILE_BYPASS_TOKEN`. Local/testing may use the deterministic app-level bypass token `local-turnstile-bypass`; non-local/test environments never resolve or share the bypass token. If Turnstile is disabled or the secret is missing outside local/testing, the verifier fails closed and magic-link mail is not sent. [RESOLVED: 02-01-PLAN.md, 02-05-PLAN.md]
 
 2. **Remember-device UX**
    - What we know: Always-remember 45 days must become explicit and configurable. [VERIFIED: 02-CONTEXT.md, MagicLinkController.php]
-   - What's unclear: Whether the beta default is visible checkbox or documented default. [VERIFIED: 02-CONTEXT.md leaves this open]
-   - Recommendation: Prefer a visible "Remember this device" checkbox in the existing sign-in menu if the UI change stays small; otherwise document a deliberate default. [ASSUMED]
+   - Decision: Plans implement a visible `Remember this device` checkbox inside the existing AppShell sign-in dropdown, below Turnstile and above the submit button, with helper copy `Stay signed in on this device for the configured beta session window.` The checkbox defaults from `auth.magic_link.remember_default`, which remains configurable and documented. [RESOLVED: 02-05-PLAN.md]
 
 3. **Production cookie values**
    - What we know: `SESSION_SECURE_COOKIE`, `SESSION_SAME_SITE`, lifetime, and domain must be documented. [VERIFIED: 02-CONTEXT.md]
-   - What's unclear: Final host/domain strategy is Phase 4 territory. [VERIFIED: STATE.md blocker]
-   - Recommendation: Document beta defaults as `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax`, database driver, and host-only domain unless production deploy needs subdomains. [ASSUMED]
+   - Decision: Plans document beta production recommendations as `TURNSTILE_ENABLED=true`, configured `TURNSTILE_SECRET_KEY`, no production use of `TURNSTILE_BYPASS_TOKEN`, `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax`, database-backed `SESSION_DRIVER=database`, and host-only `SESSION_DOMAIN=null` unless subdomains are required. [RESOLVED: 02-05-PLAN.md]
 
 ## Environment Availability
 
