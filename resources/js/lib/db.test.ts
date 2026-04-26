@@ -361,6 +361,91 @@ describe('local gratitude IndexedDB sync state', () => {
         expect(retryable).toHaveLength(0);
     });
 
+    it('applySyncResult_ignores_stale_results_after_newer_local_edits', async () => {
+        const { applySyncResult, db, getEntryByDate } = await importFreshDb();
+        const pending = makeLocalEntry({
+            entry_date: '2026-04-15',
+            person: 'Pending person',
+            grace: 'Pending grace',
+            gratitude: 'Pending gratitude',
+            sync_status: 'pending',
+            last_sync_attempt_at: 7777,
+        });
+        const newerLocal = {
+            ...pending,
+            person: 'Newer local person',
+            grace: 'Newer local grace',
+            gratitude: 'Newer local gratitude',
+            updated_at: 900,
+            sync_status: 'local' as const,
+            last_sync_attempt_at: null,
+        };
+        const canonical = makeCanonicalEntry({
+            entry_date: '2026-04-15',
+            person: 'Older server person',
+            grace: 'Older server grace',
+            gratitude: 'Older server gratitude',
+            updated_at: 800,
+        });
+
+        await db.entries.put(pending);
+        await db.entries.put(newerLocal);
+
+        const updated = await applySyncResult(
+            pending,
+            { entry_date: canonical.entry_date, status: 'skipped', entry: canonical },
+            7777,
+        );
+        const stored = await getEntryByDate(canonical.entry_date);
+
+        expect(updated).toMatchObject(newerLocal);
+        expect(stored).toMatchObject(newerLocal);
+    });
+
+    it('applySyncResult_preserves_current_local_copy_for_conflicts', async () => {
+        const { applySyncResult, db, getEntryByDate } = await importFreshDb();
+        const pending = makeLocalEntry({
+            entry_date: '2026-04-16',
+            person: 'Stale pending person',
+            grace: 'Stale pending grace',
+            gratitude: 'Stale pending gratitude',
+            sync_status: 'pending',
+            last_sync_attempt_at: 8888,
+        });
+        const current = {
+            ...pending,
+            person: 'Current pending person',
+            grace: 'Current pending grace',
+            gratitude: 'Current pending gratitude',
+            updated_at: 950,
+        };
+        const canonical = makeCanonicalEntry({
+            entry_date: '2026-04-16',
+            person: 'Winning server person',
+            grace: 'Winning server grace',
+            gratitude: 'Winning server gratitude',
+            updated_at: 1000,
+        });
+
+        await db.entries.put(pending);
+        await db.entries.put(current);
+
+        await applySyncResult(
+            pending,
+            { entry_date: canonical.entry_date, status: 'skipped', entry: canonical },
+            8888,
+        );
+        const stored = await getEntryByDate(canonical.entry_date);
+
+        expect(stored?.conflict_local_payload).toMatchObject({
+            entry_date: current.entry_date,
+            person: current.person,
+            grace: current.grace,
+            gratitude: current.gratitude,
+            updated_at: current.updated_at,
+        });
+    });
+
     it('applySyncResult_marks_rejected_entries_non_retryable', async () => {
         const { applySyncResult, db, getEntryByDate, listUnsyncedEntries } = await importFreshDb();
         const local = makeLocalEntry({

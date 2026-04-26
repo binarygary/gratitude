@@ -241,6 +241,16 @@ export async function applySyncResult(
 ): Promise<LocalEntry> {
     const current = await db.entries.get(local.local_id) ?? local;
 
+    if (
+        local.sync_status === 'pending'
+        && (
+            current.sync_status !== 'pending'
+            || current.last_sync_attempt_at !== syncedAt
+        )
+    ) {
+        return current;
+    }
+
     if (result.status === 'rejected') {
         const rejectedEntry: LocalEntry = {
             ...current,
@@ -258,7 +268,7 @@ export async function applySyncResult(
     }
 
     const canonical = result.entry;
-    const isConflict = result.status === 'skipped' && !promptsMatchCanonical(local, canonical);
+    const isConflict = result.status === 'skipped' && !promptsMatchCanonical(current, canonical);
     const updatedEntry: LocalEntry = {
         ...current,
         entry_date: canonical.entry_date,
@@ -271,7 +281,7 @@ export async function applySyncResult(
         sync_status: isConflict ? 'conflict' : 'synced',
         sync_error: null,
         server_payload: canonical,
-        conflict_local_payload: isConflict ? conflictPayloadFrom(local) : null,
+        conflict_local_payload: isConflict ? conflictPayloadFrom(current) : null,
         last_sync_attempt_at: syncedAt,
     };
 

@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppShell from '../Components/AppShell';
 import EntrySyncStatus from '../Components/EntrySyncStatus';
 import SeoHead from '../Components/SeoHead';
@@ -106,7 +106,12 @@ export default function HistoryEntry() {
     const [isLocalCopyExpanded, setIsLocalCopyExpanded] = useState(false);
     const [isRetrying, setIsRetrying] = useState(false);
     const [syncActionError, setSyncActionError] = useState<string | null>(null);
+    const isMountedRef = useRef(true);
     const formattedDate = formatHumanDate(props.date);
+
+    useEffect(() => () => {
+        isMountedRef.current = false;
+    }, []);
 
     useEffect(() => {
         let ignore = false;
@@ -173,6 +178,10 @@ export default function HistoryEntry() {
             last_sync_attempt_at: syncedAt,
         });
 
+        if (!isMountedRef.current) {
+            return;
+        }
+
         setResolvedEntry(updatedEntry);
         setIsLocalCopyExpanded(false);
     };
@@ -184,15 +193,19 @@ export default function HistoryEntry() {
         try {
             await pushUnsyncedEntries();
         } catch {
-            setSyncActionError(BATCH_SYNC_ERROR);
+            if (isMountedRef.current) {
+                setSyncActionError(BATCH_SYNC_ERROR);
+            }
         } finally {
             const refreshedEntry = await getEntryByDate(props.date);
 
-            if (refreshedEntry) {
-                setResolvedEntry(refreshedEntry);
-            }
+            if (isMountedRef.current) {
+                if (refreshedEntry) {
+                    setResolvedEntry(refreshedEntry);
+                }
 
-            setIsRetrying(false);
+                setIsRetrying(false);
+            }
         }
     };
 
