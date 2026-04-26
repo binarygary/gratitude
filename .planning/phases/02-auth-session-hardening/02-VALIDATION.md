@@ -1,8 +1,8 @@
 ---
 phase: 02
 slug: auth-session-hardening
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-04-26
 ---
@@ -70,11 +70,11 @@ created: 2026-04-26
 
 ## Validation Sign-Off
 
-- [ ] All tasks have automated verification or Wave 0 dependencies.
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verification.
-- [ ] Wave 0 covers all missing test references.
-- [ ] No watch-mode flags.
-- [ ] Feedback latency < 90 seconds for full local gate.
-- [ ] `nyquist_compliant: true` set in frontmatter after plans are verified.
+- [x] All tasks have automated verification or Wave 0 dependencies.
+- [x] Sampling continuity: no 3 consecutive tasks without automated verification.
+- [x] Wave 0 covers all missing test references.
+- [x] No watch-mode flags.
+- [x] Feedback latency < 90 seconds for full local gate.
+- [x] `nyquist_compliant: true` set in frontmatter after plans are verified.
 
-**Approval:** pending
+**Approval:** approved after plan verification on 2026-04-26
