@@ -9,7 +9,6 @@ use App\Support\Entries\EntryPayloadRules;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use LogicException;
 
 class SyncController extends Controller
 {
@@ -50,10 +49,6 @@ class SyncController extends Controller
             $seenEntryDates[$validatedEntry['entry_date']] = true;
             $result = $upsertEntry->execute($request->user(), $validatedEntry);
             $entry = $result['entry'];
-
-            if ($entry === null) {
-                throw new LogicException('Sync upsert did not return an entry.');
-            }
 
             $results[] = [
                 'entry_date' => $validatedEntry['entry_date'],
