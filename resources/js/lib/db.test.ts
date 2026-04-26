@@ -123,6 +123,7 @@ describe('local gratitude IndexedDB sync state', () => {
     });
 
     afterEach(async () => {
+        vi.useRealTimers();
         currentModule?.db.close();
         currentModule = null;
         await deleteDatabase();
@@ -238,6 +239,30 @@ describe('local gratitude IndexedDB sync state', () => {
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('synced');
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('rejected');
         expect(retryable.map((entry) => entry.sync_status)).not.toContain('conflict');
+    });
+
+    it('lists stale pending entries for automatic retry', async () => {
+        const { db, listUnsyncedEntries } = await importFreshDb();
+        const now = Date.now();
+        const freshPending = makeLocalEntry({
+            local_id: 'entry-fresh-pending',
+            entry_date: '2026-04-17',
+            sync_status: 'pending',
+            last_sync_attempt_at: now - 60_000,
+        });
+        const stalePending = makeLocalEntry({
+            local_id: 'entry-stale-pending',
+            entry_date: '2026-04-18',
+            sync_status: 'pending',
+            last_sync_attempt_at: now - 180_000,
+        });
+
+        await db.entries.bulkPut([freshPending, stalePending]);
+
+        const retryable = await listUnsyncedEntries();
+
+        expect(retryable.map((entry) => entry.local_id)).toContain(stalePending.local_id);
+        expect(retryable.map((entry) => entry.local_id)).not.toContain(freshPending.local_id);
     });
 
     it('applySyncResult_stores_canonical_upserted_entries', async () => {

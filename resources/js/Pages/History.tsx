@@ -36,6 +36,38 @@ type PageProps = {
     };
 };
 
+function hasDurableLocalStatus(status: SyncStatus): boolean {
+    return status === 'pending'
+        || status === 'failed'
+        || status === 'rejected'
+        || status === 'conflict';
+}
+
+export function mergeHistoryRows(serverEntries: HistoryRow[], localEntries: HistoryRow[]): HistoryRow[] {
+    const map = new Map<string, HistoryRow>();
+
+    for (const rawEntry of [...serverEntries, ...localEntries]) {
+        const entryDate = normalizeEntryDate(rawEntry.entry_date);
+        const entry = {
+            ...rawEntry,
+            entry_date: entryDate,
+        };
+        const existing = map.get(entryDate);
+        const entryNeedsAttention = hasDurableLocalStatus(entry.sync_status);
+        const existingNeedsAttention = existing && hasDurableLocalStatus(existing.sync_status);
+
+        if (
+            !existing
+            || entryNeedsAttention
+            || (!existingNeedsAttention && entry.updated_at >= existing.updated_at)
+        ) {
+            map.set(entryDate, entry);
+        }
+    }
+
+    return Array.from(map.values()).sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+}
+
 export default function History() {
     const { props } = usePage<PageProps>();
     const [localEntries, setLocalEntries] = useState<HistoryRow[]>([]);
@@ -89,35 +121,7 @@ export default function History() {
     })), [props.entries]);
 
     const mergedEntries = useMemo(() => {
-        const map = new Map<string, HistoryRow>();
-
-        for (const rawEntry of [...serverEntries, ...localEntries]) {
-            const entryDate = normalizeEntryDate(rawEntry.entry_date);
-            const entry = {
-                ...rawEntry,
-                entry_date: entryDate,
-            };
-            const existing = map.get(entryDate);
-            const entryNeedsAttention = entry.sync_status === 'failed'
-                || entry.sync_status === 'rejected'
-                || entry.sync_status === 'conflict';
-            const existingNeedsAttention = existing
-                && (
-                    existing.sync_status === 'failed'
-                    || existing.sync_status === 'rejected'
-                    || existing.sync_status === 'conflict'
-                );
-
-            if (
-                !existing
-                || entryNeedsAttention
-                || (!existingNeedsAttention && entry.updated_at >= existing.updated_at)
-            ) {
-                map.set(entryDate, entry);
-            }
-        }
-
-        return Array.from(map.values()).sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+        return mergeHistoryRows(serverEntries, localEntries);
     }, [localEntries, serverEntries]);
 
     const visibleEntries = useMemo(() => {

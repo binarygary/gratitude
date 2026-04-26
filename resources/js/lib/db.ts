@@ -14,6 +14,7 @@ export type CanonicalEntryPayload = {
 export type SyncErrorPayload = Record<string, string[]> | string;
 
 export const SYNC_BATCH_SIZE = 50;
+const STALE_PENDING_RETRY_AFTER_MILLISECONDS = 2 * 60 * 1000;
 
 export type SyncPushResult =
     | { entry_date: string; status: 'upserted' | 'skipped'; entry: CanonicalEntryPayload }
@@ -141,7 +142,15 @@ export async function countLocalEntries(): Promise<number> {
     return db.entries.count();
 }
 
+function isRetryablePendingEntry(entry: LocalEntry, now = Date.now()): boolean {
+    return entry.sync_status === 'pending'
+        && entry.last_sync_attempt_at !== null
+        && now - entry.last_sync_attempt_at >= STALE_PENDING_RETRY_AFTER_MILLISECONDS;
+}
+
 export async function listUnsyncedEntries(): Promise<LocalEntry[]> {
+    const now = Date.now();
+
     return db.entries.filter((entry) => {
         const legacyEntry = entry as LocalEntry & { sync_status?: SyncStatus };
 
@@ -149,7 +158,9 @@ export async function listUnsyncedEntries(): Promise<LocalEntry[]> {
             return entry.synced_at === null;
         }
 
-        return entry.sync_status === 'local' || entry.sync_status === 'failed';
+        return entry.sync_status === 'local'
+            || entry.sync_status === 'failed'
+            || isRetryablePendingEntry(entry, now);
     }).toArray();
 }
 
