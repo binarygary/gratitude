@@ -36,7 +36,7 @@ export default function Help() {
                 <div className="card-body gap-3 p-6">
                     <h2 className="text-lg font-medium text-base-content">What happens when you create an account</h2>
                     <p className="text-sm text-base-content/70">
-                        Creating an account syncs your current local entries to our database so your journal is available across devices.
+                        Creating an account backs up accepted entries. A fresh browser may not show your full journal until restore is added and verified.
                     </p>
                 </div>
             </div>

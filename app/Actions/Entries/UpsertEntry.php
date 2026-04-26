@@ -10,7 +10,7 @@ class UpsertEntry
 {
     /**
      * @param  array{entry_date:string,updated_at:int|string,person?:string|null,grace?:string|null,gratitude?:string|null}  $payload
-     * @return array{status:'skipped'|'upserted',entry:Entry|null}
+     * @return array{status:'skipped'|'upserted',entry:Entry}
      */
     public function execute(User $user, array $payload): array
     {

@@ -1,9 +1,16 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../Components/AppShell';
+import EntrySyncStatus from '../Components/EntrySyncStatus';
 import SeoHead from '../Components/SeoHead';
 import { formatHumanDate, normalizeEntryDate, todayIso } from '../lib/date';
-import { listAllEntries, pushUnsyncedEntries } from '../lib/db';
+import {
+    listAllEntries,
+    pushUnsyncedEntries,
+    type CanonicalEntryPayload,
+    type SyncErrorPayload,
+    type SyncStatus,
+} from '../lib/db';
 
 type ServerEntry = {
     entry_date: string;
@@ -11,6 +18,13 @@ type ServerEntry = {
     grace_snippet: string;
     gratitude_snippet: string;
     updated_at: number;
+};
+
+type HistoryRow = ServerEntry & {
+    sync_status: SyncStatus;
+    sync_error: SyncErrorPayload | null;
+    conflict_local_payload: CanonicalEntryPayload | null;
+    isLocal: boolean;
 };
 
 type PageProps = {
@@ -22,14 +36,53 @@ type PageProps = {
     };
 };
 
+function hasDurableLocalStatus(status: SyncStatus): boolean {
+    return status === 'pending'
+        || status === 'failed'
+        || status === 'rejected'
+        || status === 'conflict';
+}
+
+export function mergeHistoryRows(serverEntries: HistoryRow[], localEntries: HistoryRow[]): HistoryRow[] {
+    const map = new Map<string, HistoryRow>();
+
+    for (const rawEntry of [...serverEntries, ...localEntries]) {
+        const entryDate = normalizeEntryDate(rawEntry.entry_date);
+        const entry = {
+            ...rawEntry,
+            entry_date: entryDate,
+        };
+        const existing = map.get(entryDate);
+        const entryNeedsAttention = hasDurableLocalStatus(entry.sync_status);
+        const existingNeedsAttention = existing && hasDurableLocalStatus(existing.sync_status);
+
+        if (
+            !existing
+            || entryNeedsAttention
+            || (!existingNeedsAttention && entry.updated_at >= existing.updated_at)
+        ) {
+            map.set(entryDate, entry);
+        }
+    }
+
+    return Array.from(map.values()).sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+}
+
 export default function History() {
     const { props } = usePage<PageProps>();
-    const [localEntries, setLocalEntries] = useState<ServerEntry[]>([]);
+    const [localEntries, setLocalEntries] = useState<HistoryRow[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
 
     useEffect(() => {
-        listAllEntries().then((entries) => {
+        let ignore = false;
+        const loadLocalEntries = async () => {
+            const entries = await listAllEntries();
+
+            if (ignore) {
+                return;
+            }
+
             setLocalEntries(
                 entries.map((entry) => ({
                     entry_date: normalizeEntryDate(entry.entry_date),
@@ -37,38 +90,45 @@ export default function History() {
                     grace_snippet: entry.grace,
                     gratitude_snippet: entry.gratitude,
                     updated_at: entry.updated_at,
+                    sync_status: entry.sync_status,
+                    sync_error: entry.sync_error,
+                    conflict_local_payload: entry.conflict_local_payload,
+                    isLocal: true,
                 })),
             );
-        });
+        };
+
+        loadLocalEntries();
 
         if (props.auth.user) {
-            pushUnsyncedEntries().catch(() => null);
+            pushUnsyncedEntries()
+                .catch(() => null)
+                .finally(loadLocalEntries);
         }
+
+        return () => {
+            ignore = true;
+        };
     }, [props.auth.user]);
 
+    const serverEntries = useMemo<HistoryRow[]>(() => props.entries.map((entry) => ({
+        ...entry,
+        entry_date: normalizeEntryDate(entry.entry_date),
+        sync_status: 'synced',
+        sync_error: null,
+        conflict_local_payload: null,
+        isLocal: false,
+    })), [props.entries]);
+
     const mergedEntries = useMemo(() => {
-        const map = new Map<string, ServerEntry>();
-
-        for (const rawEntry of [...props.entries, ...localEntries]) {
-            const entryDate = normalizeEntryDate(rawEntry.entry_date);
-            const entry = {
-                ...rawEntry,
-                entry_date: entryDate,
-            };
-            const existing = map.get(entryDate);
-            if (!existing || entry.updated_at >= existing.updated_at) {
-                map.set(entryDate, entry);
-            }
-        }
-
-        return Array.from(map.values()).sort((a, b) => b.entry_date.localeCompare(a.entry_date));
-    }, [localEntries, props.entries]);
+        return mergeHistoryRows(serverEntries, localEntries);
+    }, [localEntries, serverEntries]);
 
     const visibleEntries = useMemo(() => {
         const query = searchQuery.trim().toLowerCase();
         const filtered = query
             ? mergedEntries.filter((entry) =>
-                  [entry.entry_date, entry.person_snippet, entry.grace_snippet, entry.gratitude_snippet]
+                  [entry.entry_date, entry.person_snippet, entry.grace_snippet, entry.gratitude_snippet, entry.sync_status]
                       .join(' ')
                       .toLowerCase()
                       .includes(query),
@@ -124,6 +184,7 @@ export default function History() {
                                     <th scope="col">Person</th>
                                     <th scope="col">Grace</th>
                                     <th scope="col">Gratitude</th>
+                                    <th scope="col">Status</th>
                                     <th scope="col">
                                         <span className="sr-only">Actions</span>
                                     </th>
@@ -136,6 +197,9 @@ export default function History() {
                                         <td className="text-base-content/70">{entry.person_snippet || '-'}</td>
                                         <td className="text-base-content/70">{entry.grace_snippet || '-'}</td>
                                         <td className="text-base-content/70">{entry.gratitude_snippet || '-'}</td>
+                                        <td>
+                                            <EntrySyncStatus status={entry.sync_status} />
+                                        </td>
                                         <td>
                                             <Link
                                                 href={entry.entry_date === todayIso() ? `/today?date=${entry.entry_date}` : `/history/${entry.entry_date}`}
