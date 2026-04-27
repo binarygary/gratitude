@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Mail\MagicLinkMail;
 use App\Models\MagicLoginToken;
 use App\Models\User;
-use App\Support\Auth\TurnstileVerifier;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Http\RedirectResponse;
@@ -25,11 +24,10 @@ class MagicLinkController extends Controller
 
     public const REUSED_LINK_STATUS = 'This sign-in link has already been used. Request a new link to continue.';
 
-    public function request(Request $request, TurnstileVerifier $turnstile): RedirectResponse
+    public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email:rfc,dns'],
-            'cf-turnstile-response' => ['nullable', 'string'],
             'remember_device' => ['sometimes', 'boolean'],
         ]);
 
@@ -37,15 +35,6 @@ class MagicLinkController extends Controller
         $rememberDevice = array_key_exists('remember_device', $validated)
             ? (bool) $validated['remember_device']
             : (bool) config('auth.magic_link.remember_default', false);
-
-        $turnstileResult = $turnstile->verify(
-            (string) $request->input('cf-turnstile-response', ''),
-            $request->ip(),
-        );
-
-        if (! $turnstileResult->successful) {
-            return back()->with('status', self::REQUEST_STATUS);
-        }
 
         $user = User::query()->firstOrCreate(
             ['email' => $email],
