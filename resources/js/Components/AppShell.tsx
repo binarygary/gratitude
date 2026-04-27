@@ -13,9 +13,17 @@ type SharedProps = {
             name: string;
             email: string;
         } | null;
+        magic_link: {
+            remember_default: boolean;
+        };
     };
     flash: {
         status?: string;
+    };
+    turnstile: {
+        enabled: boolean;
+        site_key: string | null;
+        bypass_token: string | null;
     };
 };
 
@@ -65,13 +73,20 @@ export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
+    const turnstile = props.turnstile ?? { enabled: false, site_key: null, bypass_token: null };
+    const rememberDeviceDefault = props.auth?.magic_link?.remember_default ?? false;
+    const defaultTurnstileResponse = !turnstile.enabled && turnstile.bypass_token ? turnstile.bypass_token : '';
     const [themePreference, setThemePreference] = useState<ThemePreference>(storedThemePreference);
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const loginDropdownRef = useRef<HTMLDivElement | null>(null);
 
-    const loginForm = useForm({ email: '' });
+    const loginForm = useForm({
+        email: '',
+        'cf-turnstile-response': defaultTurnstileResponse,
+        remember_device: rememberDeviceDefault,
+    });
 
     useEffect(() => {
         const root = document.documentElement;
