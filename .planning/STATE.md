@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-04-27T15:14:35.082Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-04-27T15:23:51.091Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 02 (auth-session-hardening) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -61,6 +61,7 @@ Progress: [#---------] 13%
 | Phase 02-auth-session-hardening P01 | 5 | 2 tasks | 8 files |
 | Phase 02-auth-session-hardening P02 | 4 | 2 tasks | 4 files |
 | Phase 02-auth-session-hardening P03 | 5 | 2 tasks | 5 files |
+| Phase 02-auth-session-hardening P04 | 5 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 02-auth-session-hardening]: Keep hashed token storage and signed:relative routing while moving invalid, expired, and reused token failures from aborts to app-surface recovery redirects.
 - [Phase 02-auth-session-hardening]: Render InvalidSignatureException through Laravel's exception handler so wrong-signature links do not authenticate and do not expose a raw 403 page.
 - [Phase 02-auth-session-hardening]: Ship cleanup as an explicit auth:prune-magic-links command without scheduler wiring; Plan 05 and operations docs can document usage.
+- [Phase 02-auth-session-hardening]: Keep Laravel's web guard and remember-cookie mechanism, but drive remember behavior from the stored magic-link token row.
+- [Phase 02-auth-session-hardening]: Restore standard Laravel CSRF protection for session-backed write routes instead of introducing token auth or Sanctum.
+- [Phase 02-auth-session-hardening]: Test CSRF posture at middleware level with Laravel's unit-test bypass disabled, because normal HTTP tests skip CSRF in testing.
 
 ### Pending Todos
 
@@ -115,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T15:14:35.078Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-04-27T15:23:51.087Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
