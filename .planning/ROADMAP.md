@@ -60,7 +60,7 @@ Plans:
 - [x] 02-02-PLAN.md - Magic-link request Turnstile gate, segmented throttling, and uniform response tests.
 - [x] 02-03-PLAN.md - Magic-link consume hardening and used/expired token cleanup command.
 - [x] 02-04-PLAN.md - Explicit remember-device backend posture and CSRF-protected session write routes.
-- [ ] 02-05-PLAN.md - Embedded AppShell Turnstile/remember UI, auth-session docs, and final gate.
+- [x] 02-05-PLAN.md - Embedded AppShell Turnstile/remember UI, auth-session docs, and final gate.
 **UI hint**: yes
 
 ### Phase 3: Observability & Health Signals

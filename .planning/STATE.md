@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-04-27T15:23:51.091Z"
+status: verifying
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-04-27T15:32:48.474Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
-  percent: 90
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 
 Phase: 02 (auth-session-hardening) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-27
 
-Progress: [#---------] 13%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [#---------] 13%
 | Phase 02-auth-session-hardening P02 | 4 | 2 tasks | 4 files |
 | Phase 02-auth-session-hardening P03 | 5 | 2 tasks | 5 files |
 | Phase 02-auth-session-hardening P04 | 5 | 3 tasks | 9 files |
+| Phase 02-auth-session-hardening P05 | 5 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - [Phase 02-auth-session-hardening]: Keep Laravel's web guard and remember-cookie mechanism, but drive remember behavior from the stored magic-link token row.
 - [Phase 02-auth-session-hardening]: Restore standard Laravel CSRF protection for session-backed write routes instead of introducing token auth or Sanctum.
 - [Phase 02-auth-session-hardening]: Test CSRF posture at middleware level with Laravel's unit-test bypass disabled, because normal HTTP tests skip CSRF in testing.
+- [Phase 02-auth-session-hardening]: Share only public Turnstile configuration through Inertia; the bypass token remains limited to local/testing and the secret key is never shared.
+- [Phase 02-auth-session-hardening]: Keep Turnstile and remember-device controls inside the existing AppShell sign-in dropdown rather than adding a new auth page.
+- [Phase 02-auth-session-hardening]: Document beta production posture in README while leaving scheduler wiring to production operations.
 
 ### Pending Todos
 
@@ -119,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T15:23:51.087Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-04-27T15:32:48.471Z
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
