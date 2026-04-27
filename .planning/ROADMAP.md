@@ -58,7 +58,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md - Turnstile verifier foundation, config, fakeable service seam, and tests.
 - [x] 02-02-PLAN.md - Magic-link request Turnstile gate, segmented throttling, and uniform response tests.
-- [ ] 02-03-PLAN.md - Magic-link consume hardening and used/expired token cleanup command.
+- [x] 02-03-PLAN.md - Magic-link consume hardening and used/expired token cleanup command.
 - [ ] 02-04-PLAN.md - Explicit remember-device backend posture and CSRF-protected session write routes.
 - [ ] 02-05-PLAN.md - Embedded AppShell Turnstile/remember UI, auth-session docs, and final gate.
 **UI hint**: yes
@@ -147,7 +147,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Sync Contract & Local State | 5/5 | Complete | 2026-04-26 |
-| 2. Auth & Session Hardening | 0/5 | Not started | - |
+| 2. Auth & Session Hardening | 3/5 | In Progress | - |
 | 3. Observability & Health Signals | 0/TBD | Not started | - |
 | 4. Production Runbooks & Beta Gate | 0/TBD | Not started | - |
 | 5. Notification MVP | 0/TBD | Not started | - |
