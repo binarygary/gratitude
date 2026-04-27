@@ -35,9 +35,9 @@ Route::get('/history/{date}', [HistoryEntryController::class, 'show'])
     ->where('date', '\d{4}-\d{2}-\d{2}')
     ->name('history.entry.show');
 
-Route::middleware('throttle:5,15')->group(function () {
-    Route::post('/auth/magic-link/request', [MagicLinkController::class, 'request'])->name('auth.magic.request');
-});
+Route::post('/auth/magic-link/request', [MagicLinkController::class, 'request'])
+    ->middleware('throttle:magic-link-request')
+    ->name('auth.magic.request');
 
 Route::get('/auth/magic-link/{token}', [MagicLinkController::class, 'consume'])
     ->middleware('signed:relative')

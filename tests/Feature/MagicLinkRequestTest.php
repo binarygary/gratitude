@@ -71,6 +71,62 @@ class MagicLinkRequestTest extends TestCase
         $this->assertStringNotContainsString('invalid-input-response', $response->getContent());
         $this->assertStringNotContainsString('invalid-input-response', json_encode(session()->all(), JSON_THROW_ON_ERROR));
     }
+
+    public function test_magic_link_request_is_throttled_by_ip_with_uniform_response(): void
+    {
+        Mail::fake();
+        $this->app->instance(TurnstileVerifier::class, new FakeTurnstileVerifier(new TurnstileResult(true)));
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this
+                ->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])
+                ->post(route('auth.magic.request'), [
+                    'email' => "person{$attempt}@gmail.com",
+                    'cf-turnstile-response' => 'valid-token',
+                ])
+                ->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+        }
+
+        $this->assertSame(5, MagicLoginToken::query()->count());
+
+        $this
+            ->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])
+            ->post(route('auth.magic.request'), [
+                'email' => 'person6@gmail.com',
+                'cf-turnstile-response' => 'valid-token',
+            ])
+            ->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+
+        $this->assertSame(5, MagicLoginToken::query()->count());
+    }
+
+    public function test_magic_link_request_is_throttled_by_normalized_email_with_uniform_response(): void
+    {
+        Mail::fake();
+        $this->app->instance(TurnstileVerifier::class, new FakeTurnstileVerifier(new TurnstileResult(true)));
+
+        foreach (['Person@Gmail.com', 'person@gmail.com', 'PERSON@GMAIL.COM'] as $index => $email) {
+            $this
+                ->withServerVariables(['REMOTE_ADDR' => "192.0.2.1{$index}"])
+                ->post(route('auth.magic.request'), [
+                    'email' => $email,
+                    'cf-turnstile-response' => 'valid-token',
+                ])
+                ->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+        }
+
+        $this->assertSame(3, MagicLoginToken::query()->count());
+
+        $this
+            ->withServerVariables(['REMOTE_ADDR' => '192.0.2.20'])
+            ->post(route('auth.magic.request'), [
+                'email' => 'pErSoN@gmail.com',
+                'cf-turnstile-response' => 'valid-token',
+            ])
+            ->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+
+        $this->assertSame(3, MagicLoginToken::query()->count());
+    }
 }
 
 final class FakeTurnstileVerifier implements TurnstileVerifier

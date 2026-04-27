@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Auth\MagicLinkController;
 use App\Support\Auth\BypassTurnstileVerifier;
 use App\Support\Auth\HttpTurnstileVerifier;
 use App\Support\Auth\TurnstileResult;
 use App\Support\Auth\TurnstileVerifier;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,6 +46,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        RateLimiter::for('magic-link-request', function (Request $request): array {
+            return [
+                Limit::perMinutes(15, 5)
+                    ->by('magic-link:ip:'.$request->ip())
+                    ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
+                Limit::perHour(3)
+                    ->by('magic-link:email:'.sha1(strtolower(trim((string) $request->input('email')))))
+                    ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
+            ];
+        });
     }
 }
