@@ -20,86 +20,21 @@ type SharedProps = {
     flash: {
         status?: string;
     };
-    turnstile: {
-        enabled: boolean;
-        site_key: string | null;
-        bypass_token: string | null;
-    };
 };
 
 type LoginFormData = {
     email: string;
-    'cf-turnstile-response': string;
     remember_device: boolean;
 };
 
-type TurnstileRenderOptions = {
-    sitekey: string;
-    size: 'compact';
-    callback: (token: string) => void;
-    'expired-callback': () => void;
-    'error-callback': () => void;
-};
-
-declare global {
-    interface Window {
-        turnstile?: {
-            render: (container: HTMLElement, options: TurnstileRenderOptions) => string;
-            remove?: (widgetId: string) => void;
-            reset?: (widgetId: string) => void;
-        };
-    }
-}
-
 type ThemePreference = 'retro' | 'dim' | 'system';
 type ResolvedTheme = 'retro' | 'dim';
-const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-let turnstileScriptPromise: Promise<void> | null = null;
 
 const themeLabel: Record<ThemePreference, string> = {
     retro: 'Light',
     system: 'System',
     dim: 'Dark',
 };
-
-function loadTurnstileScript(): Promise<void> {
-    if (window.turnstile) {
-        return Promise.resolve();
-    }
-
-    if (turnstileScriptPromise) {
-        return turnstileScriptPromise;
-    }
-
-    turnstileScriptPromise = new Promise((resolve, reject) => {
-        const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT_URL}"]`);
-
-        if (existingScript) {
-            existingScript.addEventListener('load', () => resolve(), { once: true });
-            existingScript.addEventListener('error', () => reject(new Error('Turnstile failed to load.')), { once: true });
-
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = TURNSTILE_SCRIPT_URL;
-        script.async = true;
-        script.defer = true;
-        script.addEventListener('load', () => resolve(), { once: true });
-        script.addEventListener(
-            'error',
-            () => {
-                turnstileScriptPromise = null;
-                reject(new Error('Turnstile failed to load.'));
-            },
-            { once: true },
-        );
-
-        document.head.appendChild(script);
-    });
-
-    return turnstileScriptPromise;
-}
 
 function storedThemePreference(): ThemePreference {
     const savedTheme = localStorage.getItem('theme');
@@ -135,84 +70,11 @@ function ThemeIcon({ preference }: { preference: ThemePreference }) {
     );
 }
 
-function TurnstileWidget({
-    siteKey,
-    resetKey,
-    onToken,
-    onClear,
-}: {
-    siteKey: string;
-    resetKey: number;
-    onToken: (token: string) => void;
-    onClear: () => void;
-}) {
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const widgetIdRef = useRef<string | null>(null);
-    const onTokenRef = useRef(onToken);
-    const onClearRef = useRef(onClear);
-
-    useEffect(() => {
-        onTokenRef.current = onToken;
-        onClearRef.current = onClear;
-    }, [onToken, onClear]);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        void loadTurnstileScript()
-            .then(() => {
-                if (cancelled || !containerRef.current || !window.turnstile || widgetIdRef.current) {
-                    return;
-                }
-
-                widgetIdRef.current = window.turnstile.render(containerRef.current, {
-                    sitekey: siteKey,
-                    size: 'compact',
-                    callback: (token) => onTokenRef.current(token),
-                    'expired-callback': () => onClearRef.current(),
-                    'error-callback': () => onClearRef.current(),
-                });
-            })
-            .catch(() => {
-                if (!cancelled) {
-                    onClearRef.current();
-                }
-            });
-
-        return () => {
-            cancelled = true;
-
-            if (widgetIdRef.current && window.turnstile?.remove) {
-                window.turnstile.remove(widgetIdRef.current);
-            }
-
-            widgetIdRef.current = null;
-        };
-    }, [siteKey]);
-
-    useEffect(() => {
-        if (!widgetIdRef.current) {
-            return;
-        }
-
-        window.turnstile?.reset?.(widgetIdRef.current);
-        onClearRef.current();
-    }, [resetKey]);
-
-    return (
-        <div className="mt-4" aria-label="Verification check">
-            <div ref={containerRef} className="max-w-full overflow-hidden" />
-        </div>
-    );
-}
-
 export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
-    const turnstile = props.turnstile ?? { enabled: false, site_key: null, bypass_token: null };
     const rememberDeviceDefault = props.auth?.magic_link?.remember_default ?? false;
-    const defaultTurnstileResponse = !turnstile.enabled && turnstile.bypass_token ? turnstile.bypass_token : '';
     const [themePreference, setThemePreference] = useState<ThemePreference>(storedThemePreference);
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
@@ -221,14 +83,10 @@ export default function AppShell({ children }: Props) {
 
     const initialLoginFormData: LoginFormData = {
         email: '',
-        'cf-turnstile-response': defaultTurnstileResponse,
         remember_device: rememberDeviceDefault,
     };
-    const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
     const loginForm = useForm<LoginFormData>(initialLoginFormData);
-    const showTurnstileWidget = turnstile.enabled && Boolean(turnstile.site_key);
-    const showVerificationUnavailable = !showTurnstileWidget && !turnstile.bypass_token;
 
     useEffect(() => {
         const root = document.documentElement;
@@ -411,13 +269,11 @@ export default function AppShell({ children }: Props) {
                                         preserveScroll: true,
                                         onSuccess: () => {
                                             loginForm.setData(initialLoginFormData);
-                                            setTurnstileResetKey((key) => key + 1);
                                             setIsLoginOpen(false);
                                         },
                                     });
                                 }}
                             >
-                                <input type="hidden" name="cf-turnstile-response" value={loginForm.data['cf-turnstile-response']} readOnly />
                                 <label className="form-control gap-2">
                                     <span className="text-sm text-base-content/70">Email</span>
                                     <input
@@ -430,17 +286,6 @@ export default function AppShell({ children }: Props) {
                                     />
                                 </label>
                                 <p className="mt-2 text-sm text-base-content/70">The link may take a minute to arrive and expires in 30 minutes.</p>
-                                {showTurnstileWidget && turnstile.site_key ? (
-                                    <TurnstileWidget
-                                        siteKey={turnstile.site_key}
-                                        resetKey={turnstileResetKey}
-                                        onToken={(token) => loginForm.setData('cf-turnstile-response', token)}
-                                        onClear={() => loginForm.setData('cf-turnstile-response', '')}
-                                    />
-                                ) : null}
-                                {showVerificationUnavailable ? (
-                                    <p className="mt-4 text-sm text-base-content/70">We could not verify this request. Try again in a minute.</p>
-                                ) : null}
                                 <label className="mt-4 flex items-start gap-2 text-sm text-base-content/80">
                                     <input
                                         type="checkbox"

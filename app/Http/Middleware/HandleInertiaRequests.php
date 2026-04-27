@@ -16,8 +16,6 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request)
     {
-        $shareBypassToken = app()->environment(['local', 'testing']);
-
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user() ? [
@@ -36,11 +34,6 @@ class HandleInertiaRequests extends Middleware
             ],
             'seo' => [
                 'base_url' => config('app.url'),
-            ],
-            'turnstile' => [
-                'enabled' => (bool) config('services.turnstile.enabled'),
-                'site_key' => config('services.turnstile.site_key'),
-                'bypass_token' => $shareBypassToken ? config('services.turnstile.bypass_token') : null,
             ],
         ]);
     }
