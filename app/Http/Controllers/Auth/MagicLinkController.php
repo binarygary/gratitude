@@ -21,6 +21,10 @@ class MagicLinkController extends Controller
 {
     public const REQUEST_STATUS = 'If your email is valid, we sent a sign-in link.';
 
+    public const INVALID_LINK_STATUS = 'This sign-in link is invalid or expired. Request a new link to continue.';
+
+    public const REUSED_LINK_STATUS = 'This sign-in link has already been used. Request a new link to continue.';
+
     private const MAGIC_LINK_REMEMBER_MINUTES = 64_800; // 45 days
 
     public function request(Request $request, TurnstileVerifier $turnstile): RedirectResponse
@@ -77,23 +81,28 @@ class MagicLinkController extends Controller
     {
         $record = MagicLoginToken::query()
             ->where('token_hash', hash('sha256', $token))
-            ->whereNull('used_at')
-            ->where('expires_at', '>', now())
             ->first();
 
-        abort_if($record === null, 403, 'This sign-in link is invalid or expired.');
+        if ($record === null || $record->user === null) {
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
+
+        if ($record->used_at !== null) {
+            return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
+        }
+
+        if (now()->greaterThanOrEqualTo($record->expires_at)) {
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
 
         $record->forceFill(['used_at' => now()])->save();
-        $user = $record->user;
-
-        abort_if($user === null, 403, 'This sign-in link is invalid or expired.');
 
         /** @var SessionGuard $guard */
         $guard = Auth::guard('web');
         $guard->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
-        $guard->login($user, remember: true);
+        $guard->login($record->user, remember: true);
         $request->session()->regenerate();
-        event(new Login('web', $user, true));
+        event(new Login('web', $record->user, true));
 
         return to_route('today.show')->with('status', 'Signed in successfully.');
     }
