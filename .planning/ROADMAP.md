@@ -49,18 +49,18 @@ Plans:
 **Depends on**: Phase 1
 **Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 **Success Criteria** (what must be TRUE):
-  1. Magic-link requests require successful server-side Turnstile or equivalent verification before mail is sent.
+  1. Magic-link requests use uniform response copy and request abuse controls before mail is sent.
   2. Repeated magic-link requests are rate-limited by IP and email while returning uniform responses.
   3. Invalid, expired, reused, tampered, and wrong-signature magic links are safely rejected.
   4. Used and expired magic-link tokens are cleaned up by a scheduled or documented operational command.
   5. Session cookie, remember-device, and CSRF or token-auth posture are configured, documented, and covered by tests.
 **Plans**: 5 plans
 Plans:
-- [x] 02-01-PLAN.md - Turnstile verifier foundation, config, fakeable service seam, and tests.
-- [x] 02-02-PLAN.md - Magic-link request Turnstile gate, segmented throttling, and uniform response tests.
+- [x] 02-01-PLAN.md - Magic-link request abuse-control foundation and uniform response posture.
+- [x] 02-02-PLAN.md - Magic-link request segmented throttling and uniform response tests.
 - [x] 02-03-PLAN.md - Magic-link consume hardening and used/expired token cleanup command.
 - [x] 02-04-PLAN.md - Explicit remember-device backend posture and CSRF-protected session write routes.
-- [x] 02-05-PLAN.md - Embedded AppShell Turnstile/remember UI, auth-session docs, and final gate.
+- [x] 02-05-PLAN.md - Embedded AppShell remember-device UI, auth-session docs, and final gate.
 **UI hint**: yes
 
 ### Phase 3: Observability & Health Signals

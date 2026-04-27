@@ -20,7 +20,7 @@ Requirements for the beta-readiness milestone. Each maps to roadmap phases.
 
 ### Authentication & Abuse Protection
 
-- [x] **AUTH-01**: Magic-link request flow verifies Cloudflare Turnstile or equivalent server-side before sending mail.
+- [x] **AUTH-01**: Magic-link request flow uses uniform response copy and abuse controls before sending mail.
 - [x] **AUTH-02**: Magic-link request flow applies segmented rate limits by IP and email without leaking account existence.
 - [x] **AUTH-03**: Magic-link consume flow safely rejects invalid, expired, reused, tampered, or wrong-signature tokens.
 - [x] **AUTH-04**: Expired and used magic-link tokens are cleaned up by a scheduled or documented operational command.

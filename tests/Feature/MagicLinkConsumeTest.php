@@ -302,7 +302,6 @@ class MagicLinkConsumeTest extends TestCase
 
         $response = $this->post(route('auth.magic.request'), [
             'email' => 'person@gmail.com',
-            'cf-turnstile-response' => config('services.turnstile.bypass_token'),
             'remember_device' => true,
         ]);
 

@@ -93,12 +93,8 @@ Open `http://127.0.0.1:8000` (or the URL shown by `php artisan serve`).
 
 ### Auth and session beta posture
 
-Magic-link requests are protected by Cloudflare Turnstile before mail is sent. Configure these keys per environment:
+Magic-link requests use account-enumeration resistant response copy and segmented throttling before mail is sent. Configure these keys per environment:
 
-- `TURNSTILE_ENABLED`
-- `TURNSTILE_SITE_KEY`
-- `TURNSTILE_SECRET_KEY`
-- `TURNSTILE_BYPASS_TOKEN` local/testing only; it is unset or ignored outside local/testing.
 - `MAGIC_LINK_EXPIRES_MINUTES`
 - `MAGIC_LINK_REMEMBER_MINUTES`
 - `MAGIC_LINK_REMEMBER_DEFAULT`
@@ -109,15 +105,12 @@ Magic-link requests are protected by Cloudflare Turnstile before mail is sent. C
 
 Beta production recommendations:
 
-- `TURNSTILE_ENABLED=true`
-- `TURNSTILE_SECRET_KEY` configured with the production Turnstile secret.
-- `TURNSTILE_BYPASS_TOKEN` unset or ignored outside local/testing.
 - `SESSION_SECURE_COOKIE=true`
 - `SESSION_SAME_SITE=lax`
 - Host-only `SESSION_DOMAIN=null` unless subdomains are required.
 - Database-backed `SESSION_DRIVER=database`.
 
-If Turnstile is disabled or the secret is missing outside local/testing, magic-link requests fail closed, so the verifier fails closed and does not send magic-link mail. The public response stays uniform.
+Magic-link request throttling is segmented by request IP and normalized email address. Accepted and throttled requests use the same public response: `If your email is valid, we sent a sign-in link.`
 
 Expired and used magic-link rows can be removed with:
 
