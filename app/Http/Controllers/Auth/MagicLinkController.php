@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\MagicLinkMail;
 use App\Models\MagicLoginToken;
 use App\Models\User;
+use App\Support\Auth\TurnstileVerifier;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Http\RedirectResponse;
@@ -18,15 +19,27 @@ use Illuminate\Support\Str;
 
 class MagicLinkController extends Controller
 {
+    public const REQUEST_STATUS = 'If your email is valid, we sent a sign-in link.';
+
     private const MAGIC_LINK_REMEMBER_MINUTES = 64_800; // 45 days
 
-    public function request(Request $request): RedirectResponse
+    public function request(Request $request, TurnstileVerifier $turnstile): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email:rfc,dns'],
+            'cf-turnstile-response' => ['nullable', 'string'],
         ]);
 
         $email = strtolower(trim($validated['email']));
+
+        $turnstileResult = $turnstile->verify(
+            (string) $request->input('cf-turnstile-response', ''),
+            $request->ip(),
+        );
+
+        if (! $turnstileResult->successful) {
+            return back()->with('status', self::REQUEST_STATUS);
+        }
 
         $user = User::query()->firstOrCreate(
             ['email' => $email],
@@ -57,7 +70,7 @@ class MagicLinkController extends Controller
 
         Mail::to($email)->send(new MagicLinkMail($url));
 
-        return back()->with('status', 'If your email is valid, we sent a sign-in link.');
+        return back()->with('status', self::REQUEST_STATUS);
     }
 
     public function consume(Request $request, string $token): RedirectResponse
