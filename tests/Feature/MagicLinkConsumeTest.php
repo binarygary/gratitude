@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\MagicLoginToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -240,5 +241,77 @@ class MagicLinkConsumeTest extends TestCase
             ->assertRedirect(route('today.show'))
             ->assertSessionHas('status', self::INVALID_LINK_STATUS);
         $this->assertGuest();
+    }
+
+    public function test_magic_link_remembers_device_when_requested(): void
+    {
+        $user = User::factory()->create();
+        $rawToken = str_repeat('4', 64);
+        $expiresAt = now()->addMinutes(30);
+
+        MagicLoginToken::query()->create([
+            'user_id' => $user->id,
+            'token_hash' => hash('sha256', $rawToken),
+            'expires_at' => $expiresAt,
+            'remember_device' => true,
+        ]);
+
+        $signedUrl = URL::temporarySignedRoute(
+            'auth.magic.consume',
+            $expiresAt,
+            ['token' => $rawToken],
+            absolute: false,
+        );
+
+        $response = $this->get($signedUrl);
+
+        $response->assertRedirect(route('today.show'));
+        $response->assertCookie($this->recallerCookieName());
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_magic_link_does_not_remember_device_by_default(): void
+    {
+        $user = User::factory()->create();
+        $rawToken = str_repeat('5', 64);
+        $expiresAt = now()->addMinutes(30);
+
+        MagicLoginToken::query()->create([
+            'user_id' => $user->id,
+            'token_hash' => hash('sha256', $rawToken),
+            'expires_at' => $expiresAt,
+        ]);
+
+        $signedUrl = URL::temporarySignedRoute(
+            'auth.magic.consume',
+            $expiresAt,
+            ['token' => $rawToken],
+            absolute: false,
+        );
+
+        $response = $this->get($signedUrl);
+
+        $response->assertRedirect(route('today.show'));
+        $response->assertCookieMissing($this->recallerCookieName());
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_magic_link_request_stores_remember_device_choice(): void
+    {
+        Mail::fake();
+
+        $response = $this->post(route('auth.magic.request'), [
+            'email' => 'person@gmail.com',
+            'cf-turnstile-response' => config('services.turnstile.bypass_token'),
+            'remember_device' => true,
+        ]);
+
+        $response->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+        $this->assertTrue(MagicLoginToken::query()->sole()->remember_device);
+    }
+
+    private function recallerCookieName(): string
+    {
+        return auth('web')->getRecallerName();
     }
 }

@@ -25,16 +25,18 @@ class MagicLinkController extends Controller
 
     public const REUSED_LINK_STATUS = 'This sign-in link has already been used. Request a new link to continue.';
 
-    private const MAGIC_LINK_REMEMBER_MINUTES = 64_800; // 45 days
-
     public function request(Request $request, TurnstileVerifier $turnstile): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email:rfc,dns'],
             'cf-turnstile-response' => ['nullable', 'string'],
+            'remember_device' => ['sometimes', 'boolean'],
         ]);
 
         $email = strtolower(trim($validated['email']));
+        $rememberDevice = array_key_exists('remember_device', $validated)
+            ? (bool) $validated['remember_device']
+            : (bool) config('auth.magic_link.remember_default', false);
 
         $turnstileResult = $turnstile->verify(
             (string) $request->input('cf-turnstile-response', ''),
@@ -56,12 +58,13 @@ class MagicLinkController extends Controller
         );
 
         $rawToken = Str::random(64);
-        $expiresAt = now()->addMinutes(30);
+        $expiresAt = now()->addMinutes((int) config('auth.magic_link.expires_minutes', 30));
 
         MagicLoginToken::query()->create([
             'user_id' => $user->id,
             'token_hash' => hash('sha256', $rawToken),
             'expires_at' => $expiresAt,
+            'remember_device' => $rememberDevice,
         ]);
 
         $relativeSignedPath = URL::temporarySignedRoute(
@@ -99,10 +102,12 @@ class MagicLinkController extends Controller
 
         /** @var SessionGuard $guard */
         $guard = Auth::guard('web');
-        $guard->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
-        $guard->login($record->user, remember: true);
+        $rememberDevice = (bool) $record->remember_device;
+
+        $guard->setRememberDuration((int) config('auth.magic_link.remember_minutes', 64800));
+        $guard->login($record->user, remember: $rememberDevice);
         $request->session()->regenerate();
-        event(new Login('web', $record->user, true));
+        event(new Login('web', $record->user, $rememberDevice));
 
         return to_route('today.show')->with('status', 'Signed in successfully.');
     }
