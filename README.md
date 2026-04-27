@@ -90,6 +90,44 @@ Open `http://127.0.0.1:8000` (or the URL shown by `php artisan serve`).
 - Magic-link emails use the `log` mailer by default (`MAIL_MAILER=log`), so links are written to `storage/logs/laravel.log`.
 - If you need externally usable magic-link URLs in a cloud session, set `APP_URL` to the active app URL for that session.
 - Automated dependency update PRs are configured with Dependabot for both Composer and npm on a weekly cadence. Minor and patch updates are grouped per ecosystem to keep review volume manageable.
+
+### Auth and session beta posture
+
+Magic-link requests are protected by Cloudflare Turnstile before mail is sent. Configure these keys per environment:
+
+- `TURNSTILE_ENABLED`
+- `TURNSTILE_SITE_KEY`
+- `TURNSTILE_SECRET_KEY`
+- `TURNSTILE_BYPASS_TOKEN` local/testing only; it is unset or ignored outside local/testing.
+- `MAGIC_LINK_EXPIRES_MINUTES`
+- `MAGIC_LINK_REMEMBER_MINUTES`
+- `MAGIC_LINK_REMEMBER_DEFAULT`
+- `SESSION_SECURE_COOKIE`
+- `SESSION_SAME_SITE`
+- `SESSION_LIFETIME`
+- `SESSION_DOMAIN`
+
+Beta production recommendations:
+
+- `TURNSTILE_ENABLED=true`
+- `TURNSTILE_SECRET_KEY` configured with the production Turnstile secret.
+- `TURNSTILE_BYPASS_TOKEN` unset or ignored outside local/testing.
+- `SESSION_SECURE_COOKIE=true`
+- `SESSION_SAME_SITE=lax`
+- Host-only `SESSION_DOMAIN=null` unless subdomains are required.
+- Database-backed `SESSION_DRIVER=database`.
+
+If Turnstile is disabled or the secret is missing outside local/testing, magic-link requests fail closed, so the verifier fails closed and does not send magic-link mail. The public response stays uniform.
+
+Expired and used magic-link rows can be removed with:
+
+```bash
+php artisan auth:prune-magic-links
+```
+
+Scheduler wiring for that command belongs with production operations.
+
+The session-authenticated write routes `/entries/upsert` and `/api/sync/push` are protected by Laravel CSRF. Same-origin Axios requests send the Blade meta token through `X-CSRF-TOKEN`.
 Main routes:
 - `/today`
 - `/history`
