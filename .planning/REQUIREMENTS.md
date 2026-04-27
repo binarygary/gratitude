@@ -21,7 +21,7 @@ Requirements for the beta-readiness milestone. Each maps to roadmap phases.
 ### Authentication & Abuse Protection
 
 - [x] **AUTH-01**: Magic-link request flow verifies Cloudflare Turnstile or equivalent server-side before sending mail.
-- [ ] **AUTH-02**: Magic-link request flow applies segmented rate limits by IP and email without leaking account existence.
+- [x] **AUTH-02**: Magic-link request flow applies segmented rate limits by IP and email without leaking account existence.
 - [ ] **AUTH-03**: Magic-link consume flow safely rejects invalid, expired, reused, tampered, or wrong-signature tokens.
 - [ ] **AUTH-04**: Expired and used magic-link tokens are cleaned up by a scheduled or documented operational command.
 - [ ] **AUTH-05**: Session cookie and remember-device behavior are configured and documented for beta production.
@@ -128,7 +128,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-07 | Phase 1 | Complete |
 | SYNC-08 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Complete |
-| AUTH-02 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Pending |
 | AUTH-04 | Phase 2 | Pending |
 | AUTH-05 | Phase 2 | Pending |

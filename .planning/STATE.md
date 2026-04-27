@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-27T14:57:10.365Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-27T15:05:58.847Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
-  percent: 60
+  completed_plans: 7
+  percent: 70
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-26)
 ## Current Position
 
 Phase: 02 (auth-session-hardening) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -59,6 +59,7 @@ Progress: [#---------] 13%
 | Phase 01-sync-contract-local-state P04 | 7 min | 2 tasks | 2 files |
 | Phase 01-sync-contract-local-state P05 | 12 min | 3 tasks | 5 files |
 | Phase 02-auth-session-hardening P01 | 5 | 2 tasks | 8 files |
+| Phase 02-auth-session-hardening P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 02-auth-session-hardening]: Use Laravel's built-in HTTP client for Cloudflare Siteverify instead of adding a package.
 - [Phase 02-auth-session-hardening]: Keep the deterministic bypass token available only when the app environment is local or testing.
 - [Phase 02-auth-session-hardening]: Bind a fail-closed verifier for non-local disabled or missing-secret states so later auth gates send no mail.
+- [Phase 02-auth-session-hardening]: Run Turnstile verification before creating users, tokens, or mail in MagicLinkController.
+- [Phase 02-auth-session-hardening]: Use a named Laravel rate limiter with separate IP and normalized-email buckets for magic-link requests.
+- [Phase 02-auth-session-hardening]: Return the same flash status for accepted, failed-verification, and throttled request attempts.
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T14:57:10.362Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-27T15:05:58.843Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

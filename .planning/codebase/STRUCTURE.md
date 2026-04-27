@@ -211,6 +211,7 @@ gratitude/
 - `tests/Feature/SyncPushTest.php`: Batch sync validation and partial success behavior.
 - `tests/Feature/TodayRouteTest.php`: Today date/timezone routing behavior.
 - `tests/Feature/SettingsUpdateTest.php`: Settings update redirects and validation.
+- `tests/Feature/MagicLinkRequestTest.php`: Turnstile-gated magic-link request and throttling behavior.
 - `tests/Feature/MagicLinkConsumeTest.php`: Signed magic-link consumption and signature handling.
 - `tests/Feature/MetricsCountsCommandTest.php`: Console metrics command.
 
