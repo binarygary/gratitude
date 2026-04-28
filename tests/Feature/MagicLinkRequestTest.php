@@ -44,6 +44,19 @@ class MagicLinkRequestTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_magic_link_request_stores_remember_device_choice(): void
+    {
+        Mail::fake();
+
+        $response = $this->post(route('auth.magic.request'), [
+            'email' => 'person@gmail.com',
+            'remember_device' => true,
+        ]);
+
+        $response->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+        $this->assertTrue(MagicLoginToken::query()->sole()->remember_device);
+    }
+
     public function test_magic_link_request_is_throttled_by_ip_with_uniform_response(): void
     {
         Mail::fake();

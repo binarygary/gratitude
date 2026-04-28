@@ -126,7 +126,7 @@ Semantic status color rules:
 | Empty state heading | Not signed in |
 | Empty state body | Enter your email to receive a sign-in link. |
 | Uniform request response | If your email is valid, we sent a sign-in link. |
-| Delivery delay helper | The link may take a minute to arrive and expires in 30 minutes. |
+| Delivery delay helper | The link may take a minute to arrive and will expire automatically. |
 | Verification unavailable helper | We could not verify this request. Try again in a minute. |
 | Invalid/expired link error state | This sign-in link is invalid or expired. Request a new link to continue. |
 | Reused link error state | This sign-in link has already been used. Request a new link to continue. |
