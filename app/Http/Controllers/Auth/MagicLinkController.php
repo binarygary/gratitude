@@ -105,8 +105,6 @@ class MagicLinkController extends Controller
             return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
         }
 
-        $record->forceFill(['used_at' => $now]);
-
         /** @var SessionGuard $guard */
         $guard = Auth::guard('web');
         $rememberDevice = (bool) $record->remember_device;

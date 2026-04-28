@@ -28,7 +28,7 @@ class MagicLinkRequestTest extends TestCase
         Mail::assertSent(MagicLinkMail::class, 1);
     }
 
-    public function test_magic_link_request_rejects_array_email_without_rate_limiter_warning(): void
+    public function test_magic_link_request_rejects_array_email_without_side_effects(): void
     {
         Mail::fake();
 
@@ -36,7 +36,9 @@ class MagicLinkRequestTest extends TestCase
             'email' => ['person@gmail.com'],
         ]);
 
-        $response->assertSessionHasErrors('email');
+        $response
+            ->assertSessionHasErrors('email')
+            ->assertSessionMissing('status');
         $this->assertSame(0, User::query()->count());
         $this->assertSame(0, MagicLoginToken::query()->count());
         Mail::assertNothingSent();
