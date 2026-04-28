@@ -285,7 +285,7 @@ export default function AppShell({ children }: Props) {
                                         onChange={(event) => loginForm.setData('email', event.target.value)}
                                     />
                                 </label>
-                                <p className="mt-2 text-sm text-base-content/70">The link may take a minute to arrive and expires in 30 minutes.</p>
+                                <p className="mt-2 text-sm text-base-content/70">The link may take a minute to arrive and expires after the configured sign-in window.</p>
                                 <label className="mt-4 flex items-start gap-2 text-sm text-base-content/80">
                                     <input
                                         type="checkbox"
