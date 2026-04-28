@@ -28,6 +28,20 @@ class MagicLinkRequestTest extends TestCase
         Mail::assertSent(MagicLinkMail::class, 1);
     }
 
+    public function test_magic_link_request_rejects_array_email_without_rate_limiter_warning(): void
+    {
+        Mail::fake();
+
+        $response = $this->post(route('auth.magic.request'), [
+            'email' => ['person@gmail.com'],
+        ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertSame(0, User::query()->count());
+        $this->assertSame(0, MagicLoginToken::query()->count());
+        Mail::assertNothingSent();
+    }
+
     public function test_magic_link_request_is_throttled_by_ip_with_uniform_response(): void
     {
         Mail::fake();

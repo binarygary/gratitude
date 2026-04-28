@@ -21,12 +21,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('magic-link-request', function (Request $request): array {
+            $emailInput = $request->input('email');
+            $normalizedEmail = is_scalar($emailInput)
+                ? strtolower(trim((string) $emailInput))
+                : '';
+
             return [
                 Limit::perMinutes(15, 5)
                     ->by('magic-link:ip:'.$request->ip())
                     ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
                 Limit::perHour(3)
-                    ->by('magic-link:email:'.sha1(strtolower(trim((string) $request->input('email')))))
+                    ->by('magic-link:email:'.sha1($normalizedEmail))
                     ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
             ];
         });
