@@ -1,8 +1,10 @@
 # Phase 02: Auth & Session Hardening - Research
 
 **Researched:** 2026-04-26  
-**Domain:** Laravel 13 passwordless auth, Cloudflare Turnstile, session CSRF hardening  
-**Confidence:** HIGH for Laravel/Turnstile mechanics, MEDIUM for final beta copy and production cookie values
+**Domain:** Laravel 13 passwordless auth, segmented request throttling, session CSRF hardening
+**Confidence:** HIGH for Laravel mechanics, MEDIUM for final beta copy and production cookie values
+
+> Supersession note: this research originally evaluated Cloudflare Turnstile as an abuse gate. That provider-specific direction was superseded by `docs/plans/2026-04-27-remove-turnstile.md`; current Phase 2 requirements use uniform response copy and segmented Laravel throttling before sending magic-link mail.
 
 <user_constraints>
 ## User Constraints (from CONTEXT.md)
@@ -12,13 +14,13 @@ Source for all bullets in this section: [VERIFIED: .planning/phases/02-auth-sess
 ### Locked Decisions
 
 ### Request Abuse Gate
-- **D-01:** Use Cloudflare Turnstile as the default "equivalent verification" for magic-link request protection because it is low-friction for a friend-share beta and does not require broad authentication UX changes.
-- **D-02:** Keep the login form embedded in the existing `AppShell` sign-in menu. Add the minimum Turnstile widget or fallback field needed there rather than creating a new auth page.
-- **D-03:** Local and test environments must have a deterministic bypass or fake verifier so auth feature tests and local magic-link logs remain ergonomic.
+- **D-01:** Superseded. Current request protection uses uniform response copy plus segmented `throttle:magic-link-request` before sending mail.
+- **D-02:** Keep the login form embedded in the existing `AppShell` sign-in menu rather than creating a new auth page.
+- **D-03:** Superseded. Local and test environments no longer need a provider bypass or fake verifier.
 
 ### Rate Limiting and Uniform Responses
 - **D-04:** Add segmented throttling by both IP and normalized email for `/auth/magic-link/request`.
-- **D-05:** Preserve the existing uniform success response, "If your email is valid, we sent a sign-in link.", for accepted, throttled, unknown, or verification-failed request attempts where possible.
+- **D-05:** Preserve the existing uniform success response, "If your email is valid, we sent a sign-in link.", for accepted, throttled, or unknown request attempts where possible.
 - **D-06:** Avoid logging private journal content or raw magic-link tokens when recording throttling or verification failures.
 
 ### Magic-Link Token Lifecycle
@@ -43,7 +45,7 @@ Source for all bullets in this section: [VERIFIED: .planning/phases/02-auth-sess
 
 ### Claude's Discretion
 
-- Exact service class boundaries for Turnstile verification, throttling helpers, and cleanup command naming.
+- Exact service class boundaries for throttling helpers and cleanup command naming.
 - Whether rate-limiter keys live inline in route/controller code or in a dedicated support class, provided tests keep the behavior clear.
 - Exact wording for short auth failure/help copy, as long as responses remain uniform where account enumeration matters.
 
@@ -60,7 +62,7 @@ Source for all bullets in this section: [VERIFIED: .planning/phases/02-auth-sess
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| AUTH-01 | Magic-link request flow verifies Cloudflare Turnstile or equivalent server-side before sending mail. [VERIFIED: .planning/REQUIREMENTS.md] | Use a small Turnstile verifier service backed by Laravel HTTP client and Cloudflare Siteverify. [CITED: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/] |
+| AUTH-01 | Magic-link request flow uses uniform response copy and abuse controls before sending mail. [VERIFIED: .planning/REQUIREMENTS.md] | Align implementation and planning artifacts to the current `.planning/REQUIREMENTS.md` wording: Laravel validates email input, `throttle:magic-link-request` segments attempts by IP and normalized email, and outward responses stay uniform. [VERIFIED: .planning/REQUIREMENTS.md, routes/web.php, app/Providers/AppServiceProvider.php] |
 | AUTH-02 | Magic-link request flow applies segmented rate limits by IP and email without leaking account existence. [VERIFIED: .planning/REQUIREMENTS.md] | Use Laravel named rate limiters returning multiple `Limit` instances keyed by IP and normalized email. [CITED: https://laravel.com/docs/13.x/routing#rate-limiting] |
 | AUTH-03 | Magic-link consume flow safely rejects invalid, expired, reused, tampered, or wrong-signature tokens. [VERIFIED: .planning/REQUIREMENTS.md] | Keep `signed:relative`, hashed token lookup, `used_at` check, and expiry check; broaden test matrix first. [VERIFIED: routes/web.php, app/Http/Controllers/Auth/MagicLinkController.php, tests/Feature/MagicLinkConsumeTest.php] |
 | AUTH-04 | Expired and used magic-link tokens are cleaned up by a scheduled or documented operational command. [VERIFIED: .planning/REQUIREMENTS.md] | Add an Artisan command deleting rows where `used_at` is not null or `expires_at <= now()`, then document/schedule it. [CITED: https://laravel.com/docs/13.x/artisan, https://laravel.com/docs/13.x/scheduling] |
@@ -78,11 +80,11 @@ Source for all bullets in this section: [VERIFIED: .planning/phases/02-auth-sess
 
 ## Summary
 
-Phase 2 should be planned as a Laravel-native hardening stack: keep the existing `web` session guard, relative signed magic-link route, hashed token table, Inertia sign-in dropdown, database-backed sessions, and Pest feature tests. [VERIFIED: routes/web.php, config/auth.php, config/session.php, resources/js/Components/AppShell.tsx, composer.json] Add Turnstile as a request gate, not as an auth identity provider. [VERIFIED: .planning/phases/02-auth-session-hardening/02-CONTEXT.md] Cloudflare requires backend Siteverify validation; client widget completion alone is not a protection boundary. [CITED: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/]
+Phase 2 should be planned as a Laravel-native hardening stack: keep the existing `web` session guard, relative signed magic-link route, hashed token table, Inertia sign-in dropdown, database-backed sessions, named throttling, and Pest feature tests. [VERIFIED: routes/web.php, config/auth.php, config/session.php, resources/js/Components/AppShell.tsx, composer.json]
 
 The most important planning split is reviewability: foundation config/services, request gating and throttling, consume/cleanup lifecycle tests, session/CSRF posture, then UI/docs. [VERIFIED: AGENTS.md, .planning/ROADMAP.md] Do not introduce Sanctum/JWT/passkeys/OAuth in this phase because user decisions explicitly preserve session auth and defer new auth methods. [VERIFIED: .planning/phases/02-auth-session-hardening/02-CONTEXT.md]
 
-**Primary recommendation:** Use Cloudflare Turnstile + Laravel HTTP client + named Laravel rate limiters + existing signed URL/session guard/CSRF middleware; add config, fakeable service seams, feature tests, and a cleanup command before touching UI copy. [CITED: Cloudflare Turnstile docs, Laravel 13 docs; VERIFIED: repo code]
+**Primary recommendation:** Use named Laravel rate limiters + existing signed URL/session guard/CSRF middleware; add config, feature tests, and a cleanup command before touching UI copy. [CITED: Laravel 13 docs; VERIFIED: repo code]
 
 ## Standard Stack
 

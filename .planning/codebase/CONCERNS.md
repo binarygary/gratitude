@@ -63,10 +63,10 @@
 - Recommendations: Add explicit `max` rules per text field and a maximum `entries` array size. Match frontend textarea guidance and export assumptions to the same limits.
 
 **Magic-link token rows accumulate and token requests create accounts immediately:**
-- Risk: Every Turnstile-accepted valid email request creates a `users` row and a `magic_login_tokens` row, with no cleanup command for expired or used tokens.
+- Risk: Every valid email request that passes segmented throttling creates a `users` row and a `magic_login_tokens` row.
 - Files: `app/Http/Controllers/Auth/MagicLinkController.php`, `app/Models/MagicLoginToken.php`, `database/migrations/2026_02_12_132221_create_magic_login_tokens_table.php`, `routes/web.php`
-- Current mitigation: Request route uses Turnstile verification plus `throttle:magic-link-request` segmented by IP and normalized email; tokens are hashed, expire after 30 minutes, and can be used once.
-- Recommendations: Add a scheduled cleanup command for expired/used tokens. Consider creating users only after a token is consumed, or track pending login requests separately.
+- Current mitigation: Request route uses `throttle:magic-link-request` segmented by IP and normalized email; tokens are hashed, expire after the configured window, can be used once, and can be pruned with `php artisan auth:prune-magic-links`.
+- Recommendations: Schedule the documented cleanup command in production operations. Consider creating users only after a token is consumed, or track pending login requests separately.
 
 **Long remember-me duration expands account exposure after magic-link login:**
 - Risk: Magic-link login sets a 45-day remember duration for every successful consume.

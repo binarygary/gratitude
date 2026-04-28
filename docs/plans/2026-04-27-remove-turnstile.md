@@ -1,7 +1,5 @@
 # Remove Turnstile Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-
 **Goal:** Remove Cloudflare Turnstile from magic-link auth while preserving rate limiting, uniform responses, remember-device behavior, CSRF posture, and documentation.
 
 **Architecture:** Magic-link requests use Laravel validation plus the existing named rate limiter as the abuse control. The controller directly creates/sends a magic link after valid email input, while throttle callbacks preserve account-enumeration resistant copy. Frontend sign-in remains embedded in AppShell with email and remember-device fields only.

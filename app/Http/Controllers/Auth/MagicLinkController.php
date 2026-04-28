@@ -71,6 +71,8 @@ class MagicLinkController extends Controller
 
     public function consume(Request $request, string $token): RedirectResponse
     {
+        $now = now();
+
         $record = MagicLoginToken::query()
             ->where('token_hash', hash('sha256', $token))
             ->first();
@@ -83,11 +85,27 @@ class MagicLinkController extends Controller
             return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
         }
 
-        if (now()->greaterThanOrEqualTo($record->expires_at)) {
+        if ($now->greaterThanOrEqualTo($record->expires_at)) {
             return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
         }
 
-        $record->forceFill(['used_at' => now()])->save();
+        $markedUsed = MagicLoginToken::query()
+            ->whereKey($record->id)
+            ->whereNull('used_at')
+            ->where('expires_at', '>', $now)
+            ->update(['used_at' => $now]);
+
+        if ($markedUsed !== 1) {
+            $record->refresh();
+
+            if ($record->used_at !== null) {
+                return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
+            }
+
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
+
+        $record->forceFill(['used_at' => $now]);
 
         /** @var SessionGuard $guard */
         $guard = Auth::guard('web');

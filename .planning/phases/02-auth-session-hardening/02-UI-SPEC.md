@@ -38,13 +38,13 @@ Required surfaces:
 | Signed-out navbar | Keep the current compact `Sign in` primary button. On small screens the existing mail icon-only button remains acceptable if it keeps `aria-label="Sign in"`. |
 | Sign-in menu | Use the existing absolute dropdown panel aligned to the right edge of the navbar. Width stays `w-72`; padding stays `p-4`; surface uses `rounded-2xl border border-base-300/50 bg-base-100 app-card-surface shadow-sm`. |
 | Email field | Keep label `Email`, `type="email"`, placeholder `you@example.com`, required validation, and full-width input. Validation errors may appear below the field in `text-sm text-error`. |
-| Turnstile widget | Place directly between the email field and submit button with `mt-4`. It must not push the menu wider than `w-72`; if the provider widget overflows, use compact rendering or scale within the dropdown. |
+| Abuse controls | Keep provider-specific verification widgets out of the sign-in menu. Abuse protection is handled by the server-side `throttle:magic-link-request` limiter, segmented by IP and normalized email. |
 | Request feedback | Use the existing global flash alert in `AppShell`: `alert alert-info`, `role="status"`, `aria-live="polite"`. Do not show different request success/failure text for accepted, throttled, unknown-email, or failed-verification cases. |
 | Invalid or expired link | Redirect to the Today surface with a global flash alert. Copy must tell the user to request a new link. Do not expose whether the email exists. |
-| Remember-device choice | If made visible, place a single checkbox row below Turnstile and above the submit button: label `Remember this device`. Helper copy must be one short sentence. If not visible, document the default in settings/help copy, not in the dropdown. |
+| Remember-device choice | Place a single checkbox row below the email field and above the submit button: label `Remember this device`. Helper copy must be one short sentence. If not visible, document the default in settings/help copy, not in the dropdown. |
 | Sign-out state | Keep account menu sign-out as a plain menu item. After sign-out, show global flash `Signed out.` |
 
-Visual hierarchy: the primary visual anchor is the compact `Sign in` button when signed out. Inside the dropdown, the email field leads to the `Send magic link` CTA, with Turnstile and remember-device controls visually subordinate to that path.
+Visual hierarchy: the primary visual anchor is the compact `Sign in` button when signed out. Inside the dropdown, the email field leads to the `Send magic link` CTA, with the remember-device control visually subordinate to that path.
 
 Out of scope for this phase: passkeys, OAuth, password login, account deletion, fresh-device restore promises, broad friend-facing onboarding, admin/support UI, and notification preferences.
 
@@ -104,7 +104,7 @@ Use existing theme tokens so light `retro` and dark `dim` modes remain supported
 | Accent (10%) | `primary`; retro custom `oklch(62% 0.09 180)` | Sign-in button, send magic link CTA, valid sync/auth status emphasis, focus ring tint |
 | Destructive | `error` | Validation errors only; no destructive user action is introduced in Phase 02 |
 
-Accent reserved for: `Sign in`, `Send magic link`, focus rings, success/synced auth-session status emphasis, and links that perform the primary auth recovery action. Do not use accent for Turnstile branding, decorative borders, helper text, neutral menu items, or every interactive element.
+Accent reserved for: `Sign in`, `Send magic link`, focus rings, success/synced auth-session status emphasis, and links that perform the primary auth recovery action. Do not use accent for decorative borders, helper text, neutral menu items, or every interactive element.
 
 Semantic status color rules:
 
@@ -138,8 +138,8 @@ Semantic status color rules:
 
 Copy rules:
 
-- Request attempts that are accepted, throttled, unknown, or verification-failed must use the uniform request response where possible.
-- Do not expose Turnstile provider error codes or rate-limit bucket details to users.
+- Request attempts that are accepted, throttled, or unknown must use the uniform request response where possible.
+- Do not expose rate-limit bucket details to users.
 - Keep auth copy plain, operational, and short. Do not add broad onboarding or privacy-positioning copy in this phase.
 - Use `Request a new link` as the recovery action label wherever invalid, expired, or reused links are surfaced.
 
@@ -151,7 +151,7 @@ Copy rules:
 |-------------|-------------------|
 | Open sign-in menu | Button toggles dropdown, sets `aria-expanded`, and keeps `aria-controls="sign-in-menu"`. |
 | Close sign-in menu | Existing outside-click and touch-close behavior remains. Successful submission closes the menu after the uniform flash is set. |
-| Submit email without Turnstile token | Prevent mail send server-side. UI may keep the same uniform response; local field-level copy may only say verification is required if it does not disclose account state. |
+| Submit email | Send the email and remember-device choice to the server. The server validates email input and applies segmented throttling before creating a magic link. |
 | Submit while processing | Disable CTA and show `Sending...`; prevent duplicate local submits. |
 | Throttled submit | Show uniform request response; do not expose 429 copy in the UI. |
 | Invalid/expired/reused link | Do not leave the user on a raw 403 page. Redirect or render an app surface with recovery copy and `Request a new link`. |
@@ -162,8 +162,7 @@ Accessibility requirements:
 
 - Global flash remains `role="status"` and `aria-live="polite"` for non-urgent auth feedback.
 - Field-level validation errors use `role="alert"` and are referenced with `aria-describedby`.
-- Turnstile container must have an accessible label or nearby visible context; do not rely on placeholder-only instructions.
-- Keyboard users must be able to tab from email to Turnstile to remember-device choice to CTA without focus traps.
+- Keyboard users must be able to tab from email to the remember-device choice to the CTA without focus traps.
 
 ---
 
@@ -182,8 +181,8 @@ Registry policy: do not add shadcn or any third-party block while implementing P
 
 | Source | Decisions Used |
 |--------|----------------|
-| `.planning/REQUIREMENTS.md` | AUTH-01 through AUTH-06 define Turnstile, segmented throttling, invalid/reused/expired link handling, cleanup, session posture, and CSRF/token-auth posture. |
-| `.planning/phases/02-auth-session-hardening/02-CONTEXT.md` | D-01 through D-18 lock Cloudflare Turnstile, embedded `AppShell` login, deterministic test bypass, uniform request copy, explicit session posture, CSRF restoration preference, and quiet auth feedback. |
+| `.planning/REQUIREMENTS.md` | AUTH-01 through AUTH-06 define segmented throttling, invalid/reused/expired link handling, cleanup, session posture, and CSRF/token-auth posture. |
+| `.planning/phases/02-auth-session-hardening/02-CONTEXT.md` | D-01 through D-18 are historical planning context; provider-specific request gate decisions were superseded by `docs/plans/2026-04-27-remove-turnstile.md`. |
 | `.planning/phases/02-auth-session-hardening/02-RESEARCH.md` | Confirms Laravel/Inertia/Axios stack, no new npm or Composer dependency, existing `AppShell` integration point, and no new auth methods. |
 | `resources/css/app.css` | Existing Tailwind 4 + daisyUI themes, app surface tokens, retro/dim theme behavior. |
 | `resources/js/Components/AppShell.tsx` | Current navbar, sign-in dropdown, flash alert, account menu, and sign-out interaction patterns. |

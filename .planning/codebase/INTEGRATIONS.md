@@ -95,7 +95,7 @@
   - User model: `app/Models/User.php`.
   - User schema: `database/migrations/0001_01_01_000000_create_users_table.php`.
   - Guard: Laravel `web` session guard in `config/auth.php`.
-  - Email request route: `POST /auth/magic-link/request` in `routes/web.php`, protected by Turnstile verification and `throttle:magic-link-request`.
+  - Email request route: `POST /auth/magic-link/request` in `routes/web.php`, protected by `throttle:magic-link-request`; input is validated in `app/Http/Controllers/Auth/MagicLinkController.php`.
   - Consume route: `GET /auth/magic-link/{token}` in `routes/web.php`, protected by relative signed URLs.
   - Logout route: `POST /logout` in `routes/web.php`, protected by `auth`.
 
