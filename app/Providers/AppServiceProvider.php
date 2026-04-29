@@ -25,13 +25,16 @@ class AppServiceProvider extends ServiceProvider
             $normalizedEmail = is_scalar($emailInput)
                 ? strtolower(trim((string) $emailInput))
                 : '';
+            $emailRateLimitValue = strlen($normalizedEmail) <= 254 && filter_var($normalizedEmail, FILTER_VALIDATE_EMAIL)
+                ? $normalizedEmail
+                : 'invalid';
 
             return [
                 Limit::perMinutes(15, 5)
                     ->by('magic-link:ip:'.$request->ip())
                     ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
                 Limit::perHour(3)
-                    ->by('magic-link:email:'.sha1($normalizedEmail))
+                    ->by('magic-link:email:'.sha1($emailRateLimitValue))
                     ->response(fn () => back()->with('status', MagicLinkController::REQUEST_STATUS)),
             ];
         });

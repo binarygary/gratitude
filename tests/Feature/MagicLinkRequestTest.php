@@ -44,6 +44,32 @@ class MagicLinkRequestTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_magic_link_request_collapses_invalid_email_rate_limit_keys(): void
+    {
+        Mail::fake();
+
+        foreach (['not-an-email', 'also-not-email', 'still invalid'] as $index => $email) {
+            $this
+                ->withServerVariables(['REMOTE_ADDR' => "192.0.2.3{$index}"])
+                ->post(route('auth.magic.request'), [
+                    'email' => $email,
+                ])
+                ->assertSessionHasErrors('email')
+                ->assertSessionMissing('status');
+        }
+
+        $this
+            ->withServerVariables(['REMOTE_ADDR' => '192.0.2.40'])
+            ->post(route('auth.magic.request'), [
+                'email' => 'different-invalid-value',
+            ])
+            ->assertSessionHas('status', 'If your email is valid, we sent a sign-in link.');
+
+        $this->assertSame(0, User::query()->count());
+        $this->assertSame(0, MagicLoginToken::query()->count());
+        Mail::assertNothingSent();
+    }
+
     public function test_magic_link_request_stores_remember_device_choice(): void
     {
         Mail::fake();
