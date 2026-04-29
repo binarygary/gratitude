@@ -96,9 +96,15 @@ class MagicLinkController extends Controller
             ->update(['used_at' => $now]);
 
         if ($markedUsed !== 1) {
-            $record->refresh();
+            $currentRecord = MagicLoginToken::query()
+                ->whereKey($record->id)
+                ->first();
 
-            if ($record->used_at !== null) {
+            if ($currentRecord === null) {
+                return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+            }
+
+            if ($currentRecord->used_at !== null) {
                 return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
             }
 
