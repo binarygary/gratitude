@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-26T01:03:41.040Z"
-last_activity: 2026-04-26
+status: verifying
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-04-27T15:32:48.474Z"
+last_activity: 2026-04-27
 progress:
   total_phases: 8
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 2
+  total_plans: 10
+  completed_plans: 10
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-26)
 
 **Core value:** Users can capture a daily gratitude reflection with confidence that it is saved, recoverable, and easy to revisit.
-**Current focus:** Phase 2 — Auth & Session Hardening
+**Current focus:** Phase 02 — auth-session-hardening
 
 ## Current Position
 
-Phase: 2 (Auth & Session Hardening)
-Plan: Not started
-Status: Ready to plan from captured context
-Last activity: 2026-04-26
+Phase: 02 (auth-session-hardening) — EXECUTING
+Plan: 5 of 5
+Status: Phase complete — ready for verification
+Last activity: 2026-04-27
 
-Progress: [#---------] 13%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -58,6 +58,11 @@ Progress: [#---------] 13%
 | Phase 01-sync-contract-local-state P03 | 6 min | 3 tasks | 8 files |
 | Phase 01-sync-contract-local-state P04 | 7 min | 2 tasks | 2 files |
 | Phase 01-sync-contract-local-state P05 | 12 min | 3 tasks | 5 files |
+| Phase 02-auth-session-hardening P01 | 5 | 2 tasks | 8 files |
+| Phase 02-auth-session-hardening P02 | 4 | 2 tasks | 4 files |
+| Phase 02-auth-session-hardening P03 | 5 | 2 tasks | 5 files |
+| Phase 02-auth-session-hardening P04 | 5 | 3 tasks | 9 files |
+| Phase 02-auth-session-hardening P05 | 5 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -84,6 +89,21 @@ Recent decisions affecting current work:
 - [Phase 01-sync-contract-local-state]: Use a shared EntrySyncStatus component with page-provided action labels so recovery copy stays explicit at each surface.
 - [Phase 01-sync-contract-local-state]: Preserve failed, rejected, and conflict local rows in History even when a server row for the same date exists.
 - [Phase 01-sync-contract-local-state]: Treat conflict discard as keeping the synced version by clearing only conflict metadata after confirmation.
+- [Phase 02-auth-session-hardening]: Use Laravel's built-in HTTP client for Cloudflare Siteverify instead of adding a package.
+- [Phase 02-auth-session-hardening]: Keep the deterministic bypass token available only when the app environment is local or testing.
+- [Phase 02-auth-session-hardening]: Bind a fail-closed verifier for non-local disabled or missing-secret states so later auth gates send no mail.
+- [Phase 02-auth-session-hardening]: Run Turnstile verification before creating users, tokens, or mail in MagicLinkController.
+- [Phase 02-auth-session-hardening]: Use a named Laravel rate limiter with separate IP and normalized-email buckets for magic-link requests.
+- [Phase 02-auth-session-hardening]: Return the same flash status for accepted, failed-verification, and throttled request attempts.
+- [Phase 02-auth-session-hardening]: Keep hashed token storage and signed:relative routing while moving invalid, expired, and reused token failures from aborts to app-surface recovery redirects.
+- [Phase 02-auth-session-hardening]: Render InvalidSignatureException through Laravel's exception handler so wrong-signature links do not authenticate and do not expose a raw 403 page.
+- [Phase 02-auth-session-hardening]: Ship cleanup as an explicit auth:prune-magic-links command without scheduler wiring; Plan 05 and operations docs can document usage.
+- [Phase 02-auth-session-hardening]: Keep Laravel's web guard and remember-cookie mechanism, but drive remember behavior from the stored magic-link token row.
+- [Phase 02-auth-session-hardening]: Restore standard Laravel CSRF protection for session-backed write routes instead of introducing token auth or Sanctum.
+- [Phase 02-auth-session-hardening]: Test CSRF posture at middleware level with Laravel's unit-test bypass disabled, because normal HTTP tests skip CSRF in testing.
+- [Phase 02-auth-session-hardening]: Share only public Turnstile configuration through Inertia; the bypass token remains limited to local/testing and the secret key is never shared.
+- [Phase 02-auth-session-hardening]: Keep Turnstile and remember-device controls inside the existing AppShell sign-in dropdown rather than adding a new auth page.
+- [Phase 02-auth-session-hardening]: Document beta production posture in README while leaving scheduler wiring to production operations.
 
 ### Pending Todos
 
@@ -103,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T01:03:41.034Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-auth-session-hardening/02-CONTEXT.md
+Last session: 2026-04-27T15:32:48.471Z
+Stopped at: Completed 02-05-PLAN.md
+Resume file: None

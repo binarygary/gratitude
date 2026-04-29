@@ -14,6 +14,7 @@ class MagicLoginToken extends Model
         'user_id',
         'token_hash',
         'expires_at',
+        'remember_device',
         'used_at',
     ];
 
@@ -21,6 +22,7 @@ class MagicLoginToken extends Model
     {
         return [
             'expires_at' => 'datetime',
+            'remember_device' => 'boolean',
             'used_at' => 'datetime',
         ];
     }

@@ -109,10 +109,11 @@
 **Magic-Link Authentication:**
 
 1. Guest users submit email from `resources/js/Components/AppShell.tsx` to `/auth/magic-link/request`.
-2. `app/Http/Controllers/Auth/MagicLinkController.php` validates the email, creates or finds `app/Models/User.php`, stores a hashed token in `app/Models/MagicLoginToken.php`, creates a relative signed URL, and sends `app/Mail/MagicLinkMail.php`.
-3. The magic-link email view is `resources/views/emails/auth/magic-link.blade.php`.
-4. The consume route `/auth/magic-link/{token}` uses `signed:relative`; `app/Http/Middleware/NormalizeHtmlEscapedSignature.php` handles HTML-escaped signature query names before validation.
-5. `MagicLinkController::consume` verifies the token hash, marks it used, logs in through the web guard, regenerates the session, and redirects to `today.show`.
+2. `routes/web.php` applies `throttle:magic-link-request`, and `app/Providers/AppServiceProvider.php` segments attempts by IP and normalized email.
+3. `app/Http/Controllers/Auth/MagicLinkController.php` validates the email, follows a uniform-response flow for valid requests, creates or finds `app/Models/User.php`, stores a hashed token in `app/Models/MagicLoginToken.php`, creates a relative signed URL, and sends `app/Mail/MagicLinkMail.php`.
+4. The magic-link email view is `resources/views/emails/auth/magic-link.blade.php`.
+5. The consume route `/auth/magic-link/{token}` uses `signed:relative`; `app/Http/Middleware/NormalizeHtmlEscapedSignature.php` handles HTML-escaped signature query names before validation.
+6. `MagicLinkController::consume` verifies the token hash, atomically marks it used, logs in through the web guard, regenerates the session, and redirects to `today.show`.
 
 **History Read and Merge:**
 

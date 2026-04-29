@@ -18,15 +18,23 @@ use Illuminate\Support\Str;
 
 class MagicLinkController extends Controller
 {
-    private const MAGIC_LINK_REMEMBER_MINUTES = 64_800; // 45 days
+    public const REQUEST_STATUS = 'If your email is valid, we sent a sign-in link.';
+
+    public const INVALID_LINK_STATUS = 'This sign-in link is invalid or expired. Request a new link to continue.';
+
+    public const REUSED_LINK_STATUS = 'This sign-in link has already been used. Request a new link to continue.';
 
     public function request(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email:rfc,dns'],
+            'remember_device' => ['sometimes', 'boolean'],
         ]);
 
         $email = strtolower(trim($validated['email']));
+        $rememberDevice = array_key_exists('remember_device', $validated)
+            ? (bool) $validated['remember_device']
+            : (bool) config('auth.magic_link.remember_default', false);
 
         $user = User::query()->firstOrCreate(
             ['email' => $email],
@@ -39,12 +47,13 @@ class MagicLinkController extends Controller
         );
 
         $rawToken = Str::random(64);
-        $expiresAt = now()->addMinutes(30);
+        $expiresAt = now()->addMinutes((int) config('auth.magic_link.expires_minutes', 30));
 
         MagicLoginToken::query()->create([
             'user_id' => $user->id,
             'token_hash' => hash('sha256', $rawToken),
             'expires_at' => $expiresAt,
+            'remember_device' => $rememberDevice,
         ]);
 
         $relativeSignedPath = URL::temporarySignedRoute(
@@ -57,30 +66,59 @@ class MagicLinkController extends Controller
 
         Mail::to($email)->send(new MagicLinkMail($url));
 
-        return back()->with('status', 'If your email is valid, we sent a sign-in link.');
+        return back()->with('status', self::REQUEST_STATUS);
     }
 
     public function consume(Request $request, string $token): RedirectResponse
     {
+        $now = now();
+
         $record = MagicLoginToken::query()
             ->where('token_hash', hash('sha256', $token))
-            ->whereNull('used_at')
-            ->where('expires_at', '>', now())
             ->first();
 
-        abort_if($record === null, 403, 'This sign-in link is invalid or expired.');
+        if ($record === null || $record->user === null) {
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
 
-        $record->forceFill(['used_at' => now()])->save();
-        $user = $record->user;
+        if ($record->used_at !== null) {
+            return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
+        }
 
-        abort_if($user === null, 403, 'This sign-in link is invalid or expired.');
+        if ($now->greaterThanOrEqualTo($record->expires_at)) {
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
+
+        $markedUsed = MagicLoginToken::query()
+            ->whereKey($record->id)
+            ->whereNull('used_at')
+            ->where('expires_at', '>', $now)
+            ->update(['used_at' => $now]);
+
+        if ($markedUsed !== 1) {
+            $currentRecord = MagicLoginToken::query()
+                ->whereKey($record->id)
+                ->first();
+
+            if ($currentRecord === null) {
+                return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+            }
+
+            if ($currentRecord->used_at !== null) {
+                return to_route('today.show')->with('status', self::REUSED_LINK_STATUS);
+            }
+
+            return to_route('today.show')->with('status', self::INVALID_LINK_STATUS);
+        }
 
         /** @var SessionGuard $guard */
         $guard = Auth::guard('web');
-        $guard->setRememberDuration(self::MAGIC_LINK_REMEMBER_MINUTES);
-        $guard->login($user, remember: true);
+        $rememberDevice = (bool) $record->remember_device;
+
+        $guard->setRememberDuration((int) config('auth.magic_link.remember_minutes', 64800));
+        $guard->login($record->user, remember: $rememberDevice);
         $request->session()->regenerate();
-        event(new Login('web', $user, true));
+        event(new Login('web', $record->user, $rememberDevice));
 
         return to_route('today.show')->with('status', 'Signed in successfully.');
     }

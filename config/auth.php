@@ -114,4 +114,10 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'magic_link' => [
+        'expires_minutes' => (int) env('MAGIC_LINK_EXPIRES_MINUTES', 30),
+        'remember_minutes' => (int) env('MAGIC_LINK_REMEMBER_MINUTES', 64800),
+        'remember_default' => (bool) env('MAGIC_LINK_REMEMBER_DEFAULT', false),
+    ],
+
 ];

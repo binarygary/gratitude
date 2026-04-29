@@ -13,14 +13,23 @@ type SharedProps = {
             name: string;
             email: string;
         } | null;
+        magic_link: {
+            remember_default: boolean;
+        };
     };
     flash: {
         status?: string;
     };
 };
 
+type LoginFormData = {
+    email: string;
+    remember_device: boolean;
+};
+
 type ThemePreference = 'retro' | 'dim' | 'system';
 type ResolvedTheme = 'retro' | 'dim';
+
 const themeLabel: Record<ThemePreference, string> = {
     retro: 'Light',
     system: 'System',
@@ -65,13 +74,19 @@ export default function AppShell({ children }: Props) {
     const { props } = usePage<SharedProps>();
     const authUser = props.auth?.user;
     const flashStatus = props.flash?.status;
+    const rememberDeviceDefault = props.auth?.magic_link?.remember_default ?? false;
     const [themePreference, setThemePreference] = useState<ThemePreference>(storedThemePreference);
     const [exporting, setExporting] = useState<false | 'json' | 'pdf' | 'csv'>(false);
     const [exportStatus, setExportStatus] = useState<string | null>(null);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const loginDropdownRef = useRef<HTMLDivElement | null>(null);
 
-    const loginForm = useForm({ email: '' });
+    const initialLoginFormData: LoginFormData = {
+        email: '',
+        remember_device: rememberDeviceDefault,
+    };
+
+    const loginForm = useForm<LoginFormData>(initialLoginFormData);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -253,7 +268,7 @@ export default function AppShell({ children }: Props) {
                                     loginForm.post('/auth/magic-link/request', {
                                         preserveScroll: true,
                                         onSuccess: () => {
-                                            loginForm.reset('email');
+                                            loginForm.setData(initialLoginFormData);
                                             setIsLoginOpen(false);
                                         },
                                     });
@@ -270,7 +285,20 @@ export default function AppShell({ children }: Props) {
                                         onChange={(event) => loginForm.setData('email', event.target.value)}
                                     />
                                 </label>
-                                <button className="btn btn-primary mt-3 w-full" type="submit" disabled={loginForm.processing}>
+                                <p className="mt-2 text-sm text-base-content/70">The link may take a minute to arrive and expires after the configured sign-in window.</p>
+                                <label className="mt-4 flex items-start gap-2 text-sm text-base-content/80">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-sm mt-0.5"
+                                        checked={loginForm.data.remember_device}
+                                        onChange={(event) => loginForm.setData('remember_device', event.target.checked)}
+                                    />
+                                    <span>
+                                        <span className="block">Remember this device</span>
+                                        <span className="block text-base-content/60">Stay signed in on this device for the configured beta session window.</span>
+                                    </span>
+                                </label>
+                                <button className="btn btn-primary mt-4 w-full" type="submit" disabled={loginForm.processing}>
                                     {loginForm.processing ? 'Sending...' : 'Send magic link'}
                                 </button>
                             </form>

@@ -191,7 +191,7 @@ Coverage output requires an enabled PHP coverage driver. The repository does not
 **Integration Tests:**
 - Scope: Laravel route, validation, auth, persistence, Inertia response, and console command behavior through the framework.
 - Route tests live in `tests/Feature/TodayRouteTest.php`, `tests/Feature/HistoryEntryRouteTest.php`, `tests/Feature/PrivacyRouteTest.php`, and `tests/Feature/ExampleTest.php`.
-- Auth/magic-link tests live in `tests/Feature/MagicLinkConsumeTest.php`.
+- Auth/magic-link tests live in `tests/Feature/MagicLinkRequestTest.php` and `tests/Feature/MagicLinkConsumeTest.php`.
 - API and sync tests live in `tests/Feature/EntryUpsertTest.php` and `tests/Feature/SyncPushTest.php`.
 - Settings persistence tests live in `tests/Feature/SettingsUpdateTest.php`.
 - Console command tests live in `tests/Feature/MetricsCountsCommandTest.php`.

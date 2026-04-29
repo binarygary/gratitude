@@ -20,12 +20,12 @@ Requirements for the beta-readiness milestone. Each maps to roadmap phases.
 
 ### Authentication & Abuse Protection
 
-- [ ] **AUTH-01**: Magic-link request flow verifies Cloudflare Turnstile or equivalent server-side before sending mail.
-- [ ] **AUTH-02**: Magic-link request flow applies segmented rate limits by IP and email without leaking account existence.
-- [ ] **AUTH-03**: Magic-link consume flow safely rejects invalid, expired, reused, tampered, or wrong-signature tokens.
-- [ ] **AUTH-04**: Expired and used magic-link tokens are cleaned up by a scheduled or documented operational command.
-- [ ] **AUTH-05**: Session cookie and remember-device behavior are configured and documented for beta production.
-- [ ] **AUTH-06**: Session-authenticated write routes have an explicit, tested CSRF or token-auth posture.
+- [x] **AUTH-01**: Magic-link request flow uses uniform response copy and abuse controls before sending mail.
+- [x] **AUTH-02**: Magic-link request flow applies segmented rate limits by IP and email without leaking account existence.
+- [x] **AUTH-03**: Magic-link consume flow safely rejects invalid, expired, reused, tampered, or wrong-signature tokens.
+- [x] **AUTH-04**: Expired and used magic-link tokens are cleaned up by a scheduled or documented operational command.
+- [x] **AUTH-05**: Session cookie and remember-device behavior are configured and documented for beta production.
+- [x] **AUTH-06**: Session-authenticated write routes have an explicit, tested CSRF or token-auth posture.
 
 ### Observability
 
@@ -127,12 +127,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-06 | Phase 1 | Complete |
 | SYNC-07 | Phase 1 | Complete |
 | SYNC-08 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
-| AUTH-04 | Phase 2 | Pending |
-| AUTH-05 | Phase 2 | Pending |
-| AUTH-06 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
+| AUTH-04 | Phase 2 | Complete |
+| AUTH-05 | Phase 2 | Complete |
+| AUTH-06 | Phase 2 | Complete |
 | OBS-01 | Phase 3 | Pending |
 | OBS-02 | Phase 3 | Pending |
 | OBS-03 | Phase 3 | Pending |

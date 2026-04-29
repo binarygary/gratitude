@@ -25,6 +25,9 @@ class HandleInertiaRequests extends Middleware
                     'timezone' => $request->user()->timezone,
                     'show_flashbacks' => (bool) $request->user()->show_flashbacks,
                 ] : null,
+                'magic_link' => [
+                    'remember_default' => (bool) config('auth.magic_link.remember_default', false),
+                ],
             ],
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),

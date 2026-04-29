@@ -90,6 +90,37 @@ Open `http://127.0.0.1:8000` (or the URL shown by `php artisan serve`).
 - Magic-link emails use the `log` mailer by default (`MAIL_MAILER=log`), so links are written to `storage/logs/laravel.log`.
 - If you need externally usable magic-link URLs in a cloud session, set `APP_URL` to the active app URL for that session.
 - Automated dependency update PRs are configured with Dependabot for both Composer and npm on a weekly cadence. Minor and patch updates are grouped per ecosystem to keep review volume manageable.
+
+### Auth and session beta posture
+
+Magic-link requests use account-enumeration resistant response copy and segmented throttling before mail is sent. Configure these keys per environment:
+
+- `MAGIC_LINK_EXPIRES_MINUTES`
+- `MAGIC_LINK_REMEMBER_MINUTES`
+- `MAGIC_LINK_REMEMBER_DEFAULT`
+- `SESSION_SECURE_COOKIE`
+- `SESSION_SAME_SITE`
+- `SESSION_LIFETIME`
+- `SESSION_DOMAIN`
+
+Beta production recommendations:
+
+- `SESSION_SECURE_COOKIE=true`
+- `SESSION_SAME_SITE=lax`
+- Host-only `SESSION_DOMAIN=null` unless subdomains are required.
+- Database-backed `SESSION_DRIVER=database`.
+
+Magic-link request throttling is segmented by request IP and normalized email address. Accepted and throttled requests use the same public response: `If your email is valid, we sent a sign-in link.`
+
+Expired and used magic-link rows can be removed with:
+
+```bash
+php artisan auth:prune-magic-links
+```
+
+Scheduler wiring for that command belongs with production operations.
+
+The session-authenticated write routes `/entries/upsert` and `/api/sync/push` are protected by Laravel CSRF. Same-origin Axios requests send the Blade meta token through `X-CSRF-TOKEN`.
 Main routes:
 - `/today`
 - `/history`
